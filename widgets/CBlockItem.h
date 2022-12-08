@@ -15,18 +15,23 @@ public:
     CBlockItem( int ins, int outs, QObject * parent = nullptr );
     ~CBlockItem() = default;
 
+public:
+    QSizeF size() const { return m_mainRect.size(); }
+
 private:
     QRectF boundingRect() const;
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    void paint( QPainter * painter,
+                const QStyleOptionGraphicsItem * option,
+                QWidget * widget );
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 
 private:
-    QRect                   m_mainRect{};
-    int                     m_pinEdge{ 12 };
-    int                     m_pinSpace{ 12 };
-    QSize                   m_mainRectBase{ 90, m_pinSpace * 4 };
+    QRectF                  m_mainRect{};
+    qreal                   m_pinEdge{ 12 };
+    qreal                   m_pinSpace{ 12 };
+    QSizeF                  m_mainRectBase{ 90, m_pinSpace * 4 };
 
     QColor                  m_inColor = Qt::green;
     QColor                  m_outColor = Qt::red;

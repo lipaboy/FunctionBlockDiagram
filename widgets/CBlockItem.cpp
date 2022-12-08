@@ -11,7 +11,7 @@ CBlockItem::CBlockItem( int ins, int outs, QObject * parent )
     m_mainRect.setY( 0 );
     m_mainRect.setWidth( m_mainRectBase.width() );
     m_mainRect.setHeight( ( m_pinEdge + m_pinSpace ) * ( max > 0 ? max - 1 : 0 ) + m_mainRectBase.height() );
-    m_mainRect.moveCenter( QPoint( 0, 0 ) );
+    m_mainRect.moveCenter( QPointF( 0, 0 ) );
 }
 
 // задаёт размер области перерисовки
@@ -33,7 +33,7 @@ void CBlockItem::paint( QPainter * painter,
     painter->setBrush( Qt::gray );
     painter->drawRect( m_mainRect );
 
-    auto fn =
+    auto drawPinsFn =
             [ painter, this ]
             ( const QColor & color, bool isLeft, int count ) -> void
     {
@@ -42,21 +42,21 @@ void CBlockItem::paint( QPainter * painter,
         pen.setColor( color );
         painter->setPen( pen );
         painter->setBrush( color );
-        int centerX = ( isLeft ? -1 : 1 ) * m_mainRect.width() / 2;
+        qreal centerX = ( isLeft ? -1 : 1 ) * m_mainRect.width() / 2;
 
-        int pinDistance = ( m_mainRect.height() - m_mainRectBase.height() )
+        qreal pinDistance = ( m_mainRect.height() - m_mainRectBase.height() )
                 / ( count > 1 ? count - 1 : 1 );
-        int firstY = m_mainRectBase.height() / 2 + m_mainRect.y();
+        qreal firstY = m_mainRectBase.height() / 2 + m_mainRect.y();
         for ( int i = 0; i < count; i++ )
         {
-            QRect inRect{ 0, 0, m_pinEdge, m_pinEdge };
-            inRect.moveCenter( QPoint( centerX, firstY + i * pinDistance ) );
+            QRectF inRect{ 0, 0, m_pinEdge, m_pinEdge };
+            inRect.moveCenter( QPointF( centerX, firstY + i * pinDistance ) );
             painter->drawRect( inRect );
         }
     };
 
-    fn( m_inColor, true, m_ins );
-    fn( m_outColor, false, m_outs );
+    drawPinsFn( m_inColor, true, m_ins );
+    drawPinsFn( m_outColor, false, m_outs );
 
     Q_UNUSED(option);
     Q_UNUSED(widget);

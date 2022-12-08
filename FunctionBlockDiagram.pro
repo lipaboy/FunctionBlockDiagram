@@ -27,14 +27,15 @@ CONFIG += c++11
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    widgets/CBlockItem.cpp
+    widgets/CBlockItem.cpp \
+    models/CFunctionGraph.cpp \
+    widgets/CFunctionBlockDiagramWidget.cpp
 
 HEADERS += \
         mainwindow.h \
-    widgets/CBlockItem.h
-
-FORMS += \
-        mainwindow.ui
+    widgets/CBlockItem.h \
+    models/CFunctionGraph.h \
+    widgets/CFunctionBlockDiagramWidget.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
