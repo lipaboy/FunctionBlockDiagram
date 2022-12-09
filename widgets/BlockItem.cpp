@@ -1,6 +1,6 @@
-#include "CBlockItem.h"
+#include "BlockItem.h"
 
-CBlockItem::CBlockItem( int ins, int outs, QObject * parent )
+BlockItem::BlockItem( int ins, int outs, QObject * parent )
     : QObject( parent ),
       QGraphicsItem(),
       m_ins( ins ),
@@ -12,17 +12,20 @@ CBlockItem::CBlockItem( int ins, int outs, QObject * parent )
     m_mainRect.setWidth( m_mainRectBase.width() );
     m_mainRect.setHeight( ( m_pinEdge + m_pinSpace ) * ( max > 0 ? max - 1 : 0 ) + m_mainRectBase.height() );
     m_mainRect.moveCenter( QPointF( 0, 0 ) );
+
+    setFlags( QGraphicsItem::ItemIsMovable );
+    setCursor( m_cursor );
 }
 
 // задаёт размер области перерисовки
-QRectF CBlockItem::boundingRect() const
+QRectF BlockItem::boundingRect() const
 {
     QRectF bounding( m_mainRect );
     bounding.adjust( -10, -10, 10, 10 );
     return bounding;
 }
 
-void CBlockItem::paint( QPainter * painter,
+void BlockItem::paint( QPainter * painter,
                         const QStyleOptionGraphicsItem * option,
                         QWidget * widget )
 {
@@ -62,30 +65,14 @@ void CBlockItem::paint( QPainter * painter,
     Q_UNUSED(widget);
 }
 
-void CBlockItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+void BlockItem::mousePressEvent( QGraphicsSceneMouseEvent * event )
 {
-    /* Устанавливаем позицию графического элемента
-     * в графической сцене, транслировав координаты
-     * курсора внутри графического элемента
-     * в координатную систему графической сцены
-     * */
-    this->setPos(mapToScene(event->pos()));
+    this->setCursor( Qt::ClosedHandCursor );
+    QGraphicsItem::mousePressEvent( event );
 }
 
-void CBlockItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
+void BlockItem::mouseReleaseEvent( QGraphicsSceneMouseEvent * event )
 {
-    /* При нажатии мышью на графический элемент
-     * заменяем курсор на руку, которая держит этот элемента
-     * */
-    this->setCursor(QCursor(Qt::ClosedHandCursor));
-    Q_UNUSED(event);
-}
-
-void CBlockItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
-{
-    /* При отпускании мышью элемента
-     * заменяем на обычный курсор стрелку
-     * */
-    this->setCursor(QCursor(Qt::ArrowCursor));
-    Q_UNUSED(event);
+    this->setCursor( m_cursor );
+    QGraphicsItem::mouseReleaseEvent( event );
 }

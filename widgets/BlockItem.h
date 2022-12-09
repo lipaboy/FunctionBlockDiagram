@@ -3,17 +3,16 @@
 
 #include <QObject>
 #include <QGraphicsSceneMouseEvent>
-#include <QDebug>
 #include <QCursor>
 #include <QGraphicsItem>
 #include <QPainter>
 
-class CBlockItem : public QObject, public QGraphicsItem
+class BlockItem : public QObject, public QGraphicsItem
 {
     Q_OBJECT
 public:
-    CBlockItem( int ins, int outs, QObject * parent = nullptr );
-    ~CBlockItem() = default;
+    BlockItem( int ins, int outs, QObject * parent = nullptr );
+    ~BlockItem() = default;
 
 public:
     QSizeF size() const { return m_mainRect.size(); }
@@ -23,9 +22,9 @@ private:
     void paint( QPainter * painter,
                 const QStyleOptionGraphicsItem * option,
                 QWidget * widget );
-    void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
-    void mousePressEvent(QGraphicsSceneMouseEvent *event);
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+
+    void mousePressEvent( QGraphicsSceneMouseEvent * event );
+    void mouseReleaseEvent( QGraphicsSceneMouseEvent * event );
 
 private:
     QRectF                  m_mainRect{};
@@ -35,6 +34,7 @@ private:
 
     QColor                  m_inColor = Qt::green;
     QColor                  m_outColor = Qt::red;
+    Qt::CursorShape         m_cursor = Qt::OpenHandCursor;
 
     int                     m_ins{};
     int                     m_outs{};

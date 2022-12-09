@@ -25,17 +25,19 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++11
 
 SOURCES += \
-        main.cpp \
-        mainwindow.cpp \
-    widgets/CBlockItem.cpp \
-    models/CFunctionGraph.cpp \
-    widgets/CFunctionBlockDiagramWidget.cpp
+    main.cpp \
+    mainwindow.cpp \
+#    widgets/PinItem.cpp \
+    models/FunctionGraph.cpp \
+    widgets/BlockItem.cpp \
+    widgets/FunctionBlockDiagramWidget.cpp
 
 HEADERS += \
-        mainwindow.h \
-    widgets/CBlockItem.h \
-    models/CFunctionGraph.h \
-    widgets/CFunctionBlockDiagramWidget.h
+    mainwindow.h \
+#    widgets/PinItem.h \
+    models/FunctionGraph.h \
+    widgets/BlockItem.h \
+    widgets/FunctionBlockDiagramWidget.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

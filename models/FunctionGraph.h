@@ -25,11 +25,11 @@ struct SFunctionNode
     QVector< SConnection >      outputPins{};
 };
 
-class CFunctionGraph : public QObject
+class FunctionGraph : public QObject
 {
     Q_OBJECT
 public:
-    explicit CFunctionGraph( QObject * parent = nullptr );
+    explicit FunctionGraph( QObject * parent = nullptr );
 
 public:
     void loadVertices( QVector< SFunctionInfo > funcInfos );

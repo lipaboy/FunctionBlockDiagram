@@ -1,20 +1,20 @@
 #ifndef CFUNCTIONBLOCKDIAGRAMWIDGET_H
 #define CFUNCTIONBLOCKDIAGRAMWIDGET_H
 
-#include "models/CFunctionGraph.h"
+#include "models/FunctionGraph.h"
 
-#include "widgets/CBlockItem.h"
+#include "widgets/BlockItem.h"
 
 #include <QWidget>
 #include <QGraphicsView>
 #include <QHash>
 
 
-class CFunctionBlockDiagramWidget : public QWidget
+class FunctionBlockDiagramWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit CFunctionBlockDiagramWidget(QWidget *parent = nullptr);
+    explicit FunctionBlockDiagramWidget(QWidget *parent = nullptr);
 
 signals:
 
@@ -28,9 +28,9 @@ private:
     QPointF                     m_stepAppearPoint{ 0, 100 };
 
     // i of m_blockMap == i of CFunctionGraph->getVertices()
-    QVector< CBlockItem * >     m_blockMap{};
+    QVector< BlockItem * >     m_blockMap{};
 
-    CFunctionGraph *            m_functionGraph{};
+    FunctionGraph *            m_functionGraph{};
 };
 
 #endif // CFUNCTIONBLOCKDIAGRAMWIDGET_H

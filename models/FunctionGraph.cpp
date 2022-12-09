@@ -1,12 +1,12 @@
-#include "CFunctionGraph.h"
+#include "FunctionGraph.h"
 
-CFunctionGraph::CFunctionGraph( QObject * parent )
+FunctionGraph::FunctionGraph( QObject * parent )
     : QObject( parent )
 {
 
 }
 
-void CFunctionGraph::loadVertices( QVector< SFunctionInfo > funcInfos )
+void FunctionGraph::loadVertices( QVector< SFunctionInfo > funcInfos )
 {
     for ( auto & info : funcInfos )
     {

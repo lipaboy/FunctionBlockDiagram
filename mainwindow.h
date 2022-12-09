@@ -1,9 +1,9 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "models/CFunctionGraph.h"
+#include "models/FunctionGraph.h"
 
-#include "widgets/CFunctionBlockDiagramWidget.h"
+#include "widgets/FunctionBlockDiagramWidget.h"
 
 #include <QMainWindow>
 #include <QGraphicsView>
@@ -24,7 +24,7 @@ public:
     ~MainWindow() = default;
 
 private:
-    CFunctionBlockDiagramWidget *       m_fbd{};
+    FunctionBlockDiagramWidget *       m_fbd{};
     QVBoxLayout *                       m_vBox{};
 };
 
