@@ -4,6 +4,7 @@
 #include "models/FunctionGraph.h"
 
 #include "widgets/BlockItem.h"
+#include "widgets/FunctionBlockItem.h"
 
 #include <QWidget>
 #include <QGraphicsView>
@@ -25,10 +26,10 @@ private:
     QGraphicsView *             m_graphicsView{};
     QGraphicsScene *            m_scene{};
     QPointF                     m_blockAppearPoint{ 100, 100 };
-    QPointF                     m_stepAppearPoint{ 0, 100 };
+    QPointF                     m_stepAppearPoint{ 0, 40 };
 
-    // i of m_blockMap == i of CFunctionGraph->getVertices()
-    QVector< BlockItem * >     m_blockMap{};
+    /** i of m_blockMap == i of CFunctionGraph->getVertices() */
+    QVector< FunctionBlockItem * >     m_blockMap{};
 
     FunctionGraph *            m_functionGraph{};
 };

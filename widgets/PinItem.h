@@ -3,11 +3,10 @@
 
 #include <QObject>
 #include <QGraphicsSceneMouseEvent>
-#include <QCursor>
-#include <QGraphicsItem>
+#include <QGraphicsRectItem>
 #include <QPainter>
 
-class PinItem : public QObject, public QGraphicsItem
+class PinItem : public QObject, public QGraphicsRectItem
 {
     Q_OBJECT
 public:
@@ -15,17 +14,12 @@ public:
     ~PinItem() = default;
 
 public:
-    void setSize( const QSizeF & newSize );
-    void setPos( const QPointF & newPos );
+//    void setSize( const QSizeF & newSize );
 
 public:
     QSizeF size() const { return m_rect.size(); }
 
 private:
-    QRectF boundingRect() const;
-    void paint( QPainter * painter,
-                const QStyleOptionGraphicsItem * option,
-                QWidget * widget );
     void mouseClickEvent( QGraphicsSceneMouseEvent * event );
 
 private:

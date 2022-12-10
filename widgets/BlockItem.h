@@ -5,9 +5,10 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QCursor>
 #include <QGraphicsItem>
+#include <QGraphicsRectItem>
 #include <QPainter>
 
-class BlockItem : public QObject, public QGraphicsItem
+class BlockItem : public QObject, public QGraphicsRectItem
 {
     Q_OBJECT
 public:
@@ -15,16 +16,17 @@ public:
     ~BlockItem() = default;
 
 public:
-    QSizeF size() const { return m_mainRect.size(); }
+//    QSizeF size() const { return m_mainRect.size(); }
+//    void setSize( QSizeF const & newSize ) { m_main}
 
 private:
-    QRectF boundingRect() const;
-    void paint( QPainter * painter,
-                const QStyleOptionGraphicsItem * option,
-                QWidget * widget );
+//    QRectF boundingRect() const;
+//    void paint( QPainter * painter,
+//                const QStyleOptionGraphicsItem * option,
+//                QWidget * widget );
 
-    void mousePressEvent( QGraphicsSceneMouseEvent * event );
-    void mouseReleaseEvent( QGraphicsSceneMouseEvent * event );
+//    void mousePressEvent( QGraphicsSceneMouseEvent * event );
+//    void mouseReleaseEvent( QGraphicsSceneMouseEvent * event );
 
 private:
     QRectF                  m_mainRect{};

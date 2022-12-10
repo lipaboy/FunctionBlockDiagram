@@ -27,17 +27,19 @@ CONFIG += c++11
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
-#    widgets/PinItem.cpp \
+    widgets/PinItem.cpp \
     models/FunctionGraph.cpp \
     widgets/BlockItem.cpp \
-    widgets/FunctionBlockDiagramWidget.cpp
+    widgets/FunctionBlockDiagramWidget.cpp \
+    widgets/FunctionBlockItem.cpp
 
 HEADERS += \
     mainwindow.h \
-#    widgets/PinItem.h \
+    widgets/PinItem.h \
     models/FunctionGraph.h \
     widgets/BlockItem.h \
-    widgets/FunctionBlockDiagramWidget.h
+    widgets/FunctionBlockDiagramWidget.h \
+    widgets/FunctionBlockItem.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
