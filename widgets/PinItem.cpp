@@ -1,5 +1,7 @@
 #include "PinItem.h"
 
+#include <QCursor>
+
 PinItem::PinItem( const QColor & baseColor, QObject * parent )
     : QObject( parent ),
       QGraphicsRectItem()
@@ -9,6 +11,12 @@ PinItem::PinItem( const QColor & baseColor, QObject * parent )
     setPen( pen );
     setBrush( baseColor );
 }
+
+//void PinItem::mouseMoveEvent( QGraphicsSceneMouseEvent * event )
+//{
+//    setCursor( Qt::CrossCursor );
+//    QGraphicsItem::mouseMoveEvent( event );
+//}
 
 //void PinItem::setSize(const QSizeF &newSize)
 //{

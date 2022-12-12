@@ -19,13 +19,18 @@ public:
     QSizeF size() const { return m_block->rect().size(); }
 
 private:
+    virtual void mousePressEvent( QGraphicsSceneMouseEvent * event );
+    virtual void mouseReleaseEvent( QGraphicsSceneMouseEvent * event );
+    virtual void hoverEnterEvent( QGraphicsSceneHoverEvent * event );
+
+private:
     BlockItem *                 m_block{};
     QVector< PinItem * >        m_inPins{};
     QVector< PinItem * >        m_outPins{};
 
-    qreal                   m_pinEdge{ 12 };
-    qreal                   m_pinSpace{ 12 };
-    QSizeF                  m_mainRectBase{ 90, m_pinSpace * 4 };
+    qreal                       m_pinEdge{ 12 };
+    qreal                       m_pinSpace{ 12 };
+    QSizeF                      m_mainRectBase{ 90, m_pinSpace * 4 };
 };
 
 #endif // FUNCTIONBLOCKITEM_H

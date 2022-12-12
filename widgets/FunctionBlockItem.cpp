@@ -1,11 +1,13 @@
 #include "FunctionBlockItem.h"
 
+#include <QDebug>
+
 FunctionBlockItem::FunctionBlockItem( int ins, int outs, QObject * parent )
     : QObject( parent )
 {
     int max = std::max( ins, outs );
 
-    m_block = new BlockItem( 0, 0, this );
+    m_block = new BlockItem( this );
     {
         QRectF rect{};
         rect.setX( 0 );
@@ -63,13 +65,87 @@ FunctionBlockItem::FunctionBlockItem( int ins, int outs, QObject * parent )
     drawPinsFn( true, m_inPins );
     drawPinsFn( false, m_outPins );
 
-    {
-        QRectF rect{ 0, 0, 10, 10 };
-        auto * p = new QGraphicsEllipseItem( this );
-        rect.moveCenter( QPointF( 0, 0 ) );
-        p->setRect( rect );
-        p->setPos( 0, 0 );
-    }
+    QGraphicsItemGroup::setHandlesChildEvents( true );
+    QGraphicsItemGroup::setFiltersChildEvents( true );
+//    setAcceptHoverEvents( true );
+}
 
-    setFlags( QGraphicsItem::ItemIsMovable );
+void FunctionBlockItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    QPointF mousePoint{ /*mapToScene*/( event->pos() ) };
+    auto rect = m_block->rect();
+//    rect.moveCenter( /*mapToScene*/( m_block->pos() ) );
+    qDebug() << rect << mousePoint;
+    bool flag = false;
+    if ( m_block->rect().contains( mousePoint ) )
+    {
+        flag = true;
+        for ( auto * pin : m_inPins )
+        {
+            if ( pin->rect().contains( mousePoint ) )
+            {
+                flag = false;
+                break;
+            }
+        }
+        for ( auto * pin : m_outPins )
+        {
+            if ( pin->rect().contains( mousePoint ) )
+            {
+                flag = false;
+                break;
+            }
+        }
+    }
+    if ( flag )
+    {
+        setCursor( Qt::ClosedHandCursor );
+        setFlag( QGraphicsItem::ItemIsMovable, true );
+    }
+    else
+    {
+        setFlag( QGraphicsItem::ItemIsMovable, false );
+    }
+    QGraphicsItemGroup::mousePressEvent( event );
+}
+
+void FunctionBlockItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
+    setCursor( Qt::OpenHandCursor );
+    QGraphicsItemGroup::mouseReleaseEvent( event );
+}
+
+void FunctionBlockItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
+{
+    QPointF mousePoint{ event->pos() };
+    qDebug() << m_block->rect() << mousePoint;
+//    if ( m_block->rect().contains( mousePoint ) )
+//    {
+//        bool flag = false;
+//        for ( auto * pin : m_inPins )
+//        {
+//            if ( pin->rect().contains( mousePoint ) )
+//            {
+//                flag = true;
+//                break;
+//            }
+//        }
+//        for ( auto * pin : m_outPins )
+//        {
+//            if ( pin->rect().contains( mousePoint ) )
+//            {
+//                flag = true;
+//                break;
+//            }
+//        }
+//        if ( flag )
+//        {
+//            setCursor( Qt::CrossCursor );
+//        }
+//        else
+//        {
+//            setCursor( Qt::ArrowCursor );
+//        }
+//    }
+    QGraphicsItemGroup::hoverEnterEvent( event );
 }

@@ -20,7 +20,8 @@ public:
     QSizeF size() const { return m_rect.size(); }
 
 private:
-    void mouseClickEvent( QGraphicsSceneMouseEvent * event );
+//    void mouseClickEvent( QGraphicsSceneMouseEvent * event );
+//    void mouseMoveEvent( QGraphicsSceneMouseEvent * event );
 
 private:
     QRectF                  m_rect{};
