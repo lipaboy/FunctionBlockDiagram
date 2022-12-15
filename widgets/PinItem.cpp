@@ -4,12 +4,25 @@
 
 PinItem::PinItem( const QColor & baseColor, QObject * parent )
     : QObject( parent ),
-      QGraphicsRectItem()
+      QGraphicsRectItem(),
+      m_baseColor( baseColor )
 {
     QPen pen{};
     pen.setWidth( 0 );
     setPen( pen );
     setBrush( baseColor );
+}
+
+void PinItem::setSelected( bool isSelected )
+{
+    setBrush( isSelected ? m_selectColor : m_baseColor );
+}
+
+void PinItem::mousePressEvent( QGraphicsSceneMouseEvent * event )
+{
+    emit clicked();
+    QGraphicsItem::mousePressEvent( event );
+//    Q_UNUSED( event );
 }
 
 //void PinItem::mouseMoveEvent( QGraphicsSceneMouseEvent * event )

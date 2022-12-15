@@ -4,6 +4,7 @@
 
 FunctionBlockItem::FunctionBlockItem( int ins, int outs, QObject * parent )
     : QObject( parent )
+    , QGraphicsItemGroup()
 {
     int max = std::max( ins, outs );
 
@@ -25,13 +26,17 @@ FunctionBlockItem::FunctionBlockItem( int ins, int outs, QObject * parent )
     }
     addToGroup( m_block );
 
-
-
     QColor inPinColor = Qt::green;
     for ( int i = 0; i < ins; i++ )
     {
         auto * pinItem = new PinItem( inPinColor, this );
         m_inPins.push_back( pinItem );
+        connect( pinItem, & PinItem::clicked,
+                 this,
+                 [ this, index = m_inPins.size() - 1 ] () -> void
+        {
+            emit this->pinClicked( true, index );
+        }, Qt::DirectConnection );
     }
 
     QColor outPinColor = Qt::red;
@@ -39,6 +44,12 @@ FunctionBlockItem::FunctionBlockItem( int ins, int outs, QObject * parent )
     {
         auto * pinItem = new PinItem( outPinColor, this );
         m_outPins.push_back( pinItem );
+        connect( pinItem, & PinItem::clicked,
+                 this,
+                 [ this, index = m_outPins.size() - 1 ] () -> void
+        {
+            emit this->pinClicked( false, index );
+        }, Qt::DirectConnection );
     }
 
     auto drawPinsFn =
@@ -65,53 +76,84 @@ FunctionBlockItem::FunctionBlockItem( int ins, int outs, QObject * parent )
     drawPinsFn( true, m_inPins );
     drawPinsFn( false, m_outPins );
 
-    QGraphicsItemGroup::setHandlesChildEvents( true );
+    QGraphicsItemGroup::setHandlesChildEvents( false );
     QGraphicsItemGroup::setFiltersChildEvents( true );
-//    setAcceptHoverEvents( true );
+    //    setAcceptHoverEvents( true );
+
+    setFlag( QGraphicsItem::ItemIsMovable, true );
+
+
+}
+
+void FunctionBlockItem::setPinSelected( bool isIn,
+                                        int index,
+                                        bool isSelected )
+{
+    ( isIn ? m_inPins[ index ] : m_outPins[ index ] )
+            ->setSelected( isSelected );
+}
+
+QPointF FunctionBlockItem::getEdgePinPoint(bool isIn, bool pinIndex) const
+{
+    if ( isIn )
+    {
+        auto * pin = m_inPins[ pinIndex ];
+        return mapToScene(
+                    QPointF( pin->rect().left(),
+                             pin->rect().top()
+                             + pin->rect().height() / 2 )
+                    );
+    }
+    auto * pin = m_outPins[ pinIndex ];
+    return mapToScene(
+                QPointF( pin->rect().right(),
+                         pin->rect().top()
+                         + pin->rect().height() / 2 )
+                );
 }
 
 void FunctionBlockItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    QPointF mousePoint{ /*mapToScene*/( event->pos() ) };
-    auto rect = m_block->rect();
-//    rect.moveCenter( /*mapToScene*/( m_block->pos() ) );
-    qDebug() << rect << mousePoint;
-    bool flag = false;
-    if ( m_block->rect().contains( mousePoint ) )
-    {
-        flag = true;
-        for ( auto * pin : m_inPins )
-        {
-            if ( pin->rect().contains( mousePoint ) )
-            {
-                flag = false;
-                break;
-            }
-        }
-        for ( auto * pin : m_outPins )
-        {
-            if ( pin->rect().contains( mousePoint ) )
-            {
-                flag = false;
-                break;
-            }
-        }
-    }
-    if ( flag )
-    {
-        setCursor( Qt::ClosedHandCursor );
-        setFlag( QGraphicsItem::ItemIsMovable, true );
-    }
-    else
-    {
-        setFlag( QGraphicsItem::ItemIsMovable, false );
-    }
+//    QPointF mousePoint{ /*mapToScene*/( event->pos() ) };
+//    auto rect = m_block->rect();
+////    rect.moveCenter( /*mapToScene*/( m_block->pos() ) );
+//    qDebug() << rect << mousePoint;
+//    bool flag = false;
+//    if ( m_block->rect().contains( mousePoint ) )
+//    {
+//        flag = true;
+//        for ( auto * pin : m_inPins )
+//        {
+//            if ( pin->rect().contains( mousePoint ) )
+//            {
+//                flag = false;
+//                break;
+//            }
+//        }
+//        for ( auto * pin : m_outPins )
+//        {
+//            if ( pin->rect().contains( mousePoint ) )
+//            {
+//                flag = false;
+//                break;
+//            }
+//        }
+//    }
+//    if ( flag )
+//    {
+//        setCursor( Qt::ClosedHandCursor );
+//        setFlag( QGraphicsItem::ItemIsMovable, true );
+//    }
+//    else
+//    {
+//        setFlag( QGraphicsItem::ItemIsMovable, false );
+//    }
     QGraphicsItemGroup::mousePressEvent( event );
 }
 
 void FunctionBlockItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-    setCursor( Qt::OpenHandCursor );
+//    setCursor( Qt::OpenHandCursor );
     QGraphicsItemGroup::mouseReleaseEvent( event );
 }
 

@@ -13,18 +13,18 @@ public:
     PinItem( const QColor & baseColor, QObject * parent = nullptr );
     ~PinItem() = default;
 
-public:
-//    void setSize( const QSizeF & newSize );
+public slots:
+    void setSelected( bool isSelected );
 
-public:
-    QSizeF size() const { return m_rect.size(); }
+signals:
+    void clicked();
 
 private:
-//    void mouseClickEvent( QGraphicsSceneMouseEvent * event );
+    void mousePressEvent( QGraphicsSceneMouseEvent * event );
 //    void mouseMoveEvent( QGraphicsSceneMouseEvent * event );
 
 private:
-    QRectF                  m_rect{};
+    QColor                  m_baseColor{};
     QColor                  m_selectColor = Qt::blue;
 };
 

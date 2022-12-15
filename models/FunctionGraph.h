@@ -5,6 +5,8 @@
 #include <QString>
 #include <QVector>
 
+#include <optional>
+
 struct SFunctionInfo
 {
     QString         funcName{};
@@ -12,17 +14,29 @@ struct SFunctionInfo
     int             outputPinCount{};
 };
 
+struct SFunctionPinIndex
+{
+    int func{};
+    int pin{};
+
+    bool operator==( SFunctionPinIndex const & other ) const
+    {
+        return func == other.func && pin == other.pin;
+    }
+    bool operator!=( SFunctionPinIndex const & other ) const
+    {
+        return ! ( *this == other );
+    }
+};
+
+using SFunctionPinIndexOpt = std::optional< SFunctionPinIndex >;
+
 struct SFunctionNode
 {
-    struct SConnection
-    {
-        SFunctionNode *     funcPtr{ nullptr };
-        int                 pinIndex{ 0 };
-    };
-
-    QString                     name{};
-    QVector< SConnection >      inputPins{};
-    QVector< SConnection >      outputPins{};
+    QString                             name{};
+    /** Связь либо есть, либо её нет. Но pin существует в любом случае */
+    QVector< SFunctionPinIndexOpt >     inputPins{};
+    QVector< SFunctionPinIndexOpt >     outputPins{};
 };
 
 class FunctionGraph : public QObject
@@ -33,12 +47,17 @@ public:
 
 public:
     void loadVertices( QVector< SFunctionInfo > funcInfos );
+    void connectVertices( SFunctionPinIndex const & inVertex,
+                          SFunctionPinIndex const & outVertex );
 
 public:
     QVector< SFunctionNode > getVertices() const { return m_vertices; }
 
 signals:
     void updated();
+    void connectionChanged( SFunctionPinIndex const & inVertex,
+                            SFunctionPinIndex const & outVertex,
+                            bool hasConnection );
 
 private:
     QVector< SFunctionNode >        m_vertices{};

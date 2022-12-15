@@ -22,7 +22,9 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-CONFIG += c++11
+CONFIG += c++17
+win32: QMAKE_CXXFLAGS += /std:c++17
+unix:  QMAKE_CXXFLAGS += -std=c++17
 
 SOURCES += \
     main.cpp \
@@ -31,7 +33,8 @@ SOURCES += \
     models/FunctionGraph.cpp \
     widgets/BlockItem.cpp \
     widgets/FunctionBlockDiagramWidget.cpp \
-    widgets/FunctionBlockItem.cpp
+    widgets/FunctionBlockItem.cpp \
+    widgets/ConnectionItem.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -39,7 +42,8 @@ HEADERS += \
     models/FunctionGraph.h \
     widgets/BlockItem.h \
     widgets/FunctionBlockDiagramWidget.h \
-    widgets/FunctionBlockItem.h
+    widgets/FunctionBlockItem.h \
+    widgets/ConnectionItem.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
