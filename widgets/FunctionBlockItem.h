@@ -15,24 +15,27 @@ class FunctionBlockItem : public QObject, public QGraphicsItemGroup
     Q_OBJECT
 public:
     FunctionBlockItem( int ins, int outs, QObject * parent = nullptr );
-    ~FunctionBlockItem() = default;
+    ~FunctionBlockItem() override = default;
 
 public:
     void setPinSelected(bool isIn, int index, bool isSelected );
 
 public:
     QSizeF size() const { return m_block->rect().size(); }
-    QPointF getEdgePinPoint( bool isIn, bool pinIndex ) const;
+    QPointF getEdgePinPoint(bool isIn, int pinIndex ) const;
 
 signals:
     void pinClicked( bool isIn, int pinIndex );
+    void positionChanged();
 
-private slots:
+protected:
+    QVariant itemChange( QGraphicsItem::GraphicsItemChange change,
+                         const QVariant & value ) override;
 
 private:
-    virtual void mousePressEvent( QGraphicsSceneMouseEvent * event );
-    virtual void mouseReleaseEvent( QGraphicsSceneMouseEvent * event );
-    virtual void hoverEnterEvent( QGraphicsSceneHoverEvent * event );
+    void mousePressEvent( QGraphicsSceneMouseEvent * event ) override;
+    void mouseReleaseEvent( QGraphicsSceneMouseEvent * event ) override;
+    void hoverEnterEvent( QGraphicsSceneHoverEvent * event ) override;
 
 private:
     BlockItem *                 m_block{};

@@ -150,6 +150,28 @@ void FunctionBlockDiagramWidget::setConnection( const SFunctionPinIndex & inFunc
                             outBlockItem->getEdgePinPoint( false, outFuncIndex.pin )
                             )
                         );
+
+            connect( inBlockItem, & FunctionBlockItem::positionChanged,
+                     lineItem,
+                     [ blockItem = inBlockItem,
+                     lineItem,
+                     pin = inFuncIndex.pin ] () -> void
+            {
+                auto line = lineItem->line();
+                line.setP1( blockItem->getEdgePinPoint( true, pin ) );
+                lineItem->setLine( line );
+            }, Qt::DirectConnection );
+
+            connect( outBlockItem, & FunctionBlockItem::positionChanged,
+                     lineItem,
+                     [ blockItem = outBlockItem,
+                     lineItem,
+                     pin = outFuncIndex.pin ] () -> void
+            {
+                auto line = lineItem->line();
+                line.setP2( blockItem->getEdgePinPoint( false, pin ) );
+                lineItem->setLine( line );
+            }, Qt::DirectConnection );
         }
     }
 }

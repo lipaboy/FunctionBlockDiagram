@@ -23,6 +23,9 @@ FunctionBlockItem::FunctionBlockItem( int ins, int outs, QObject * parent )
         pen.setColor( Qt::black );
         pen.setWidth( 1 );
         m_block->setPen( pen );
+        connect( m_block, & BlockItem::positionChanged,
+                 this, & FunctionBlockItem::positionChanged,
+                 Qt::DirectConnection );
     }
     addToGroup( m_block );
 
@@ -81,8 +84,7 @@ FunctionBlockItem::FunctionBlockItem( int ins, int outs, QObject * parent )
     //    setAcceptHoverEvents( true );
 
     setFlag( QGraphicsItem::ItemIsMovable, true );
-
-
+    setFlag( QGraphicsItem::ItemSendsScenePositionChanges, true );
 }
 
 void FunctionBlockItem::setPinSelected( bool isIn,
@@ -93,7 +95,7 @@ void FunctionBlockItem::setPinSelected( bool isIn,
             ->setSelected( isSelected );
 }
 
-QPointF FunctionBlockItem::getEdgePinPoint(bool isIn, bool pinIndex) const
+QPointF FunctionBlockItem::getEdgePinPoint(bool isIn, int pinIndex) const
 {
     if ( isIn )
     {
@@ -110,6 +112,16 @@ QPointF FunctionBlockItem::getEdgePinPoint(bool isIn, bool pinIndex) const
                          pin->rect().top()
                          + pin->rect().height() / 2 )
                 );
+}
+
+QVariant FunctionBlockItem::itemChange( QGraphicsItem::GraphicsItemChange change,
+                                        const QVariant & value )
+{
+    if ( change == ItemPositionChange )
+    {
+        emit positionChanged();
+    }
+    return QGraphicsItem::itemChange( change, value );
 }
 
 void FunctionBlockItem::mousePressEvent(QGraphicsSceneMouseEvent *event)

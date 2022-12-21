@@ -7,7 +7,7 @@ ConnectionItem::ConnectionItem(QObject *parent)
       QGraphicsLineItem ()
 {
     QPen pen{};
-    pen.setWidth( 1 );
+    pen.setWidth( 2 );
     pen.setColor( QColor::fromRgb( 0, 119, 255 ) );
     this->setPen( pen );
 }

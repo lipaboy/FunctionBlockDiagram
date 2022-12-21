@@ -5,7 +5,16 @@ BlockItem::BlockItem( QObject * parent )
       QGraphicsRectItem()
 {
 //    setCursor( m_cursor );
-//        QGraphicsItemGroup::setHandlesChildEvents( false );
+    //        QGraphicsItemGroup::setHandlesChildEvents( false );
+}
+
+QVariant BlockItem::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
+{
+//    if ( change == ItemPositionChange )
+//    {
+//        emit positionChanged();
+//    }
+    return QGraphicsItem::itemChange( change, value );
 }
 
 void BlockItem::mousePressEvent( QGraphicsSceneMouseEvent * event )

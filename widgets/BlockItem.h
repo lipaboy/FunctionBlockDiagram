@@ -13,11 +13,18 @@ class BlockItem : public QObject, public QGraphicsRectItem
     Q_OBJECT
 public:
     BlockItem( QObject * parent = nullptr );
-    ~BlockItem() = default;
+    ~BlockItem() override = default;
+
+signals:
+    void positionChanged();
+
+protected:
+    QVariant itemChange( QGraphicsItem::GraphicsItemChange change,
+                         const QVariant & value ) override;
 
 private:
-    void mousePressEvent( QGraphicsSceneMouseEvent * event );
-    void mouseReleaseEvent( QGraphicsSceneMouseEvent * event );
+    void mousePressEvent( QGraphicsSceneMouseEvent * event ) override;
+    void mouseReleaseEvent( QGraphicsSceneMouseEvent * event ) override;
 
 private:
     Qt::CursorShape         m_cursor = Qt::OpenHandCursor;
