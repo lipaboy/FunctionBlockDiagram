@@ -45,6 +45,7 @@ class FunctionBlockDiagramWidget : public QWidget
     Q_OBJECT
 public:
     explicit FunctionBlockDiagramWidget(QWidget *parent = nullptr);
+//    ~FunctionBlockDiagramWidget() override = default;
 
 signals:
 
@@ -69,7 +70,7 @@ private:
     QPointF                                         m_stepAppearPoint{ 0, 40 };
     /** i of m_blockMap == i of CFunctionGraph->getVertices() */
     QVector< FunctionBlockItem * >                  m_blockMap{};
-    QHash< SConnection, ConnectionItem * >       m_linesMap{};
+    QHash< SConnection, ConnectionItem * >          m_linesMap{};
 
     // Model
     FunctionGraph *                                 m_functionGraph{};

@@ -52,6 +52,14 @@ FunctionBlockDiagramWidget::FunctionBlockDiagramWidget( QWidget * parent )
 
 }
 
+//FunctionBlockDiagramWidget::~FunctionBlockDiagramWidget()
+//{
+//    for ( auto * line : m_linesMap.values() )
+//    {
+//        delete line;
+//    }
+//}
+
 void FunctionBlockDiagramWidget::graphUpdated()
 {
     auto vertices = m_functionGraph->getVertices();
@@ -82,6 +90,7 @@ void FunctionBlockDiagramWidget::graphUpdated()
                 + m_stepAppearPoint;
     }
 
+    // Подгрузка связей
 //    for ( int i = 0; i < vertices.size(); i++ )
 //    {
 //        auto & vertex = vertices[ i ];
