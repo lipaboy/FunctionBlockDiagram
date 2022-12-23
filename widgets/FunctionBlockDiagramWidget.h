@@ -3,15 +3,14 @@
 
 #include "models/FunctionGraph.h"
 
-#include "widgets/BlockItem.h"
-#include "widgets/FunctionBlockItem.h"
-#include "widgets/ConnectionItem.h"
-
 #include <QWidget>
 #include <QGraphicsView>
 #include <QHash>
 
 #include <optional>
+
+class FunctionBlockItem;
+class ConnectionItem;
 
 struct SConnection
 {
@@ -34,10 +33,10 @@ struct SConnection
     }
 };
 
-inline uint qHash( const SConnection & key, uint seed )
+inline size_t qHash( const SConnection & key, size_t seed )
 {
-    return qHash( key.inFunc.func, seed ) ^ uint( key.inFunc.pin )
-            ^ qHash( key.outFunc.func, seed ) ^ uint( key.outFunc.pin );
+    return qHash( key.inFunc.func, seed ) ^ size_t( key.inFunc.pin )
+            ^ qHash( key.outFunc.func, seed ) ^ size_t( key.outFunc.pin );
 }
 
 class FunctionBlockDiagramWidget : public QWidget
@@ -45,7 +44,7 @@ class FunctionBlockDiagramWidget : public QWidget
     Q_OBJECT
 public:
     explicit FunctionBlockDiagramWidget(QWidget *parent = nullptr);
-//    ~FunctionBlockDiagramWidget() override = default;
+    ~FunctionBlockDiagramWidget() override;
 
 signals:
 
@@ -53,6 +52,9 @@ public slots:
     void graphUpdated();
 
     void blockPinClicked( bool isIn, int blockIndex, int pinIndex );
+
+protected:
+    void keyPressEvent( QKeyEvent * event ) override;
 
 private:
     void setPinSelected( bool isIn, const SFunctionPinIndex & pairIndex, bool isSelected );
@@ -70,7 +72,6 @@ private:
     QPointF                                         m_stepAppearPoint{ 0, 40 };
     /** i of m_blockMap == i of CFunctionGraph->getVertices() */
     QVector< FunctionBlockItem * >                  m_blockMap{};
-    QHash< SConnection, ConnectionItem * >          m_linesMap{};
 
     // Model
     FunctionGraph *                                 m_functionGraph{};
@@ -78,6 +79,9 @@ private:
     // Connections
     std::optional< SFunctionPinIndex >              m_inPinSelected{ std::nullopt };
     std::optional< SFunctionPinIndex >              m_outPinSelected{ std::nullopt };
+
+    QHash< SConnection, ConnectionItem * >          m_linesMap{};
+    std::optional< SConnection >                    m_connectionSelected{ std::nullopt };
 };
 
 #endif // CFUNCTIONBLOCKDIAGRAMWIDGET_H

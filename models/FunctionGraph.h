@@ -35,8 +35,8 @@ struct SFunctionNode
 {
     QString                             name{};
     /** Связь либо есть, либо её нет. Но pin существует в любом случае */
-    QVector< SFunctionPinIndexOpt >     inputPins{};
-    QVector< SFunctionPinIndexOpt >     outputPins{};
+    QVector< SFunctionPinIndexOpt >     inPins{};
+    QVector< SFunctionPinIndexOpt >     outPins{};
 };
 
 class FunctionGraph : public QObject
@@ -49,6 +49,8 @@ public:
     void loadVertices( QVector< SFunctionInfo > funcInfos );
     void connectVertices( SFunctionPinIndex const & inVertex,
                           SFunctionPinIndex const & outVertex );
+    void disconnectVertices( SFunctionPinIndex const & inVertex,
+                             SFunctionPinIndex const & outVertex );
 
 public:
     QVector< SFunctionNode > getVertices() const { return m_vertices; }
@@ -58,6 +60,10 @@ signals:
     void connectionChanged( SFunctionPinIndex const & inVertex,
                             SFunctionPinIndex const & outVertex,
                             bool hasConnection );
+
+private:
+    SFunctionPinIndexOpt & unzipInIndex( SFunctionPinIndex const & index );
+    SFunctionPinIndexOpt & unzipOutIndex( SFunctionPinIndex const & index );
 
 private:
     QVector< SFunctionNode >        m_vertices{};

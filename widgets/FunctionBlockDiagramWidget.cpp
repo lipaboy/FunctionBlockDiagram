@@ -1,7 +1,12 @@
 #include "FunctionBlockDiagramWidget.h"
 
-#include <QDebug>
+#include "widgets/FunctionBlockItem.h"
+#include "widgets/ConnectionItem.h"
+
+#include <QKeyEvent>
 #include <QVBoxLayout>
+
+#include <QDebug>
 
 FunctionBlockDiagramWidget::FunctionBlockDiagramWidget( QWidget * parent )
     : QWidget( parent )
@@ -49,16 +54,15 @@ FunctionBlockDiagramWidget::FunctionBlockDiagramWidget( QWidget * parent )
             { "Kek", 2, 2 },
             { "Lol", 0, 0 },
         } );
-
 }
 
-//FunctionBlockDiagramWidget::~FunctionBlockDiagramWidget()
-//{
-//    for ( auto * line : m_linesMap.values() )
-//    {
-//        delete line;
-//    }
-//}
+FunctionBlockDiagramWidget::~FunctionBlockDiagramWidget()
+{
+    for ( auto iter = m_linesMap.begin(); iter != m_linesMap.end(); ++iter )
+    {
+        delete iter.value();
+    }
+}
 
 void FunctionBlockDiagramWidget::graphUpdated()
 {
@@ -71,8 +75,8 @@ void FunctionBlockDiagramWidget::graphUpdated()
     for ( int i = m_blockMap.size(); i < vertices.size(); i++ )
     {
         auto & vertex = vertices[i];
-        auto * blockItem = new FunctionBlockItem( vertex.inputPins.size(),
-                                                  vertex.outputPins.size(),
+        auto * blockItem = new FunctionBlockItem( vertex.inPins.size(),
+                                                  vertex.outPins.size(),
                                                   this );
         position += QPointF( 0, blockItem->size().height() / 2 );
         {
@@ -131,6 +135,20 @@ void FunctionBlockDiagramWidget::blockPinClicked( bool isIn,
     }
 }
 
+void FunctionBlockDiagramWidget::keyPressEvent(QKeyEvent *event)
+{
+    if ( event->key() == Qt::Key::Key_Delete
+         || event->key() == Qt::Key::Key_Backspace )
+    {
+        if ( m_connectionSelected.has_value() )
+        {
+            auto con = m_connectionSelected.value();
+            m_functionGraph->disconnectVertices( con.inFunc, con.outFunc );
+            m_connectionSelected.reset();
+        }
+    }
+}
+
 void FunctionBlockDiagramWidget::setPinSelected(
         bool isIn,
         const SFunctionPinIndex & pairIndex,
@@ -141,14 +159,18 @@ void FunctionBlockDiagramWidget::setPinSelected(
 
 void FunctionBlockDiagramWidget::setConnection( const SFunctionPinIndex & inFuncIndex,
                                                 const SFunctionPinIndex & outFuncIndex,
-                                                bool hasConnection )
+                                                bool isConnected )
 {
     SConnection keyCon{ inFuncIndex, outFuncIndex };
-    if ( hasConnection )
+    if ( ! isConnected )
+    {
+        delete m_linesMap.take( keyCon );
+    }
+    else
     {
         if ( ! m_linesMap.contains( keyCon ) )
         {
-            auto * lineItem = new ConnectionItem( this );
+            auto * lineItem = new ConnectionItem( nullptr );
             m_linesMap.insert( keyCon, lineItem );
             m_scene->addItem( lineItem );
             auto * inBlockItem = m_blockMap[ inFuncIndex.func ];
@@ -159,6 +181,27 @@ void FunctionBlockDiagramWidget::setConnection( const SFunctionPinIndex & inFunc
                             outBlockItem->getEdgePinPoint( false, outFuncIndex.pin )
                             )
                         );
+
+            connect( lineItem, & ConnectionItem::selected,
+                     this,
+                     [ this, keyCon ] ( bool isSelected ) -> void
+            {
+                if ( ! isSelected )
+                {
+                    m_connectionSelected.reset();
+                }
+                else
+                {
+                    if ( m_connectionSelected.has_value()
+                         && m_connectionSelected.value() != keyCon )
+                    {
+                        auto * lineSelected =
+                                *( m_linesMap.find( m_connectionSelected.value() ) );
+                        lineSelected->setSelected( false );
+                    }
+                    m_connectionSelected = keyCon;
+                }
+            } );
 
             connect( inBlockItem, & FunctionBlockItem::positionChanged,
                      lineItem,

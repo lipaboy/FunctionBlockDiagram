@@ -12,8 +12,8 @@ void FunctionGraph::loadVertices( QVector< SFunctionInfo > funcInfos )
     {
         SFunctionNode node{};
         node.name = info.funcName;
-        node.inputPins.resize( info.inputPinCount );
-        node.outputPins.resize( info.outputPinCount );
+        node.inPins.resize( info.inputPinCount );
+        node.outPins.resize( info.outputPinCount );
         m_vertices.push_back( node );
     }
 
@@ -23,11 +23,39 @@ void FunctionGraph::loadVertices( QVector< SFunctionInfo > funcInfos )
 void FunctionGraph::connectVertices( const SFunctionPinIndex & inVertex,
                                      const SFunctionPinIndex & outVertex )
 {
-    if ( inVertex.func != outVertex.func )
+    SFunctionPinIndexOpt & rInPin = unzipInIndex( inVertex );
+    SFunctionPinIndexOpt & rOutPin = unzipOutIndex( outVertex );
+    if ( inVertex.func != outVertex.func
+         && ! rInPin.has_value()
+         && ! rOutPin.has_value() )
     {
-        m_vertices[ inVertex.func ].inputPins[ inVertex.pin ] = outVertex;
-        m_vertices[ outVertex.func ].outputPins[ outVertex.pin ] = inVertex;
+        rInPin = outVertex;
+        rOutPin = inVertex;
 
         emit connectionChanged( inVertex, outVertex, true );
     }
+}
+
+void FunctionGraph::disconnectVertices( const SFunctionPinIndex & inVertex,
+                                        const SFunctionPinIndex & outVertex )
+{
+    SFunctionPinIndexOpt & rInPin = unzipInIndex( inVertex );
+    SFunctionPinIndexOpt & rOutPin = unzipOutIndex( outVertex );
+    if ( rInPin == outVertex && rOutPin == inVertex )
+    {
+        rInPin.reset();
+        rOutPin.reset();
+
+        emit this->connectionChanged( inVertex, outVertex, false );
+    }
+}
+
+SFunctionPinIndexOpt & FunctionGraph::unzipInIndex( const SFunctionPinIndex & index )
+{
+    return m_vertices[ index.func ].inPins[ index.pin ];
+}
+
+SFunctionPinIndexOpt &FunctionGraph::unzipOutIndex(const SFunctionPinIndex &index)
+{
+    return m_vertices[ index.func ].outPins[ index.pin ];
 }

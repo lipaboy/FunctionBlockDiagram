@@ -9,21 +9,13 @@ ConnectionItem::ConnectionItem(QObject *parent)
     : QObject ( parent ),
       QGraphicsLineItem()
 {
-    this->setPen( QPen( QColor::fromRgb( 0, 119, 255 ), 3 ) );
+    this->setPen( QPen( m_baseColor, m_width ) );
 
+    setFlag( ItemIsSelectable, true );
 //    setFlag( ItemSendsGeometryChanges, true );
 //    setFlag( ItemSendsScenePositionChanges, true );
 
     recalcSelectionPolygon();
-}
-
-void ConnectionItem::mousePressEvent( QGraphicsSceneMouseEvent * event )
-{
-    emit clicked();
-    QPen pen{};
-    pen.setColor( this->pen().color() == Qt::yellow ? Qt::blue : Qt::yellow );
-    setPen( pen );
-    QGraphicsItem::mousePressEvent( event );
 }
 
 // Костыль: нужно придумать как пересчитывать область выделения через itemChange method
@@ -33,14 +25,19 @@ void ConnectionItem::setLine(const QLineF &line)
     recalcSelectionPolygon();
 }
 
-//QVariant ConnectionItem::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
-//{
+QVariant ConnectionItem::itemChange( QGraphicsItem::GraphicsItemChange change,
+                                     const QVariant & value )
+{
+    if ( change == ItemSelectedChange )
+    {
+        emit selected( value.toBool() );
+    }
 //    if ( change == ItemPositionChange )
 //    {
 //        recalcSelectionPolygon();
 //    }
-//    return QGraphicsItem::itemChange( change, value );
-//}
+    return QGraphicsItem::itemChange( change, value );
+}
 
 QRectF ConnectionItem::boundingRect() const
 {
@@ -58,13 +55,15 @@ void ConnectionItem::paint( QPainter * painter,
                             const QStyleOptionGraphicsItem * option,
                             QWidget * widget )
 {
-    Q_UNUSED(option);
-    Q_UNUSED(widget);
-    painter->setPen(pen());
-    painter->drawLine(line());
+    Q_UNUSED( option );
+    Q_UNUSED( widget );
+    painter->setPen( isSelected() ? QPen( m_selectedColor, m_width )
+                                  : QPen( m_baseColor, m_width ) );
+    painter->drawLine( line() );
+    if ( isSelected() )
     {
-//        painter->setPen( QPen( Qt::red, 2, Qt::DashLine ) );
-//        painter->drawPolygon( m_selectionPolygon );
+        painter->setPen( QPen( Qt::red, 2, Qt::DashLine ) );
+        painter->drawPolygon( m_selectionPolygon );
     }
 }
 
