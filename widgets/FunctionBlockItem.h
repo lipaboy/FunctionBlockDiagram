@@ -1,27 +1,32 @@
 #ifndef FUNCTIONBLOCKITEM_H
 #define FUNCTIONBLOCKITEM_H
 
-#include "BlockItem.h"
-#include "PinItem.h"
-
 #include <QObject>
 #include <QGraphicsItemGroup>
+#include <QGraphicsSimpleTextItem>
 #include <QVector>
+#include <QString>
 
 #include <optional>
+
+class BlockItem;
+class PinItem;
 
 class FunctionBlockItem : public QObject, public QGraphicsItemGroup
 {
     Q_OBJECT
 public:
-    FunctionBlockItem( int ins, int outs, QObject * parent = nullptr );
+    FunctionBlockItem( QString const & labelText,
+                       int ins,
+                       int outs,
+                       QObject * parent = nullptr );
     ~FunctionBlockItem() override = default;
 
 public:
     void setPinSelected(bool isIn, int index, bool isSelected );
 
 public:
-    QSizeF size() const { return m_block->rect().size(); }
+    QSizeF size() const;
     QPointF getEdgePinPoint(bool isIn, int pinIndex ) const;
 
 signals:
@@ -41,13 +46,14 @@ private:
     BlockItem *                 m_block{};
     QVector< PinItem * >        m_inPins{};
     QVector< PinItem * >        m_outPins{};
+    QGraphicsSimpleTextItem *   m_label{};
 
     std::optional< int >        m_inPinSelected{ std::nullopt };
     std::optional< int >        m_outPinSelected{ std::nullopt };
 
     qreal                       m_pinEdge{ 12 };
     qreal                       m_pinSpace{ 12 };
-    QSizeF                      m_mainRectBase{ 90, m_pinSpace * 4 };
+    QSizeF                      m_mainRectBase{ 50, m_pinSpace * 4 };
 };
 
 #endif // FUNCTIONBLOCKITEM_H

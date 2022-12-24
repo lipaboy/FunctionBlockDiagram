@@ -1,19 +1,38 @@
 #include "FunctionBlockItem.h"
 
+#include "BlockItem.h"
+#include "PinItem.h"
+
 #include <QDebug>
 
-FunctionBlockItem::FunctionBlockItem( int ins, int outs, QObject * parent )
+FunctionBlockItem::FunctionBlockItem( const QString & labelText,
+                                      int ins,
+                                      int outs,
+                                      QObject * parent )
     : QObject( parent )
     , QGraphicsItemGroup()
 {
     int max = std::max( ins, outs );
+
+
+    m_label = new QGraphicsSimpleTextItem( this );
+    {
+        m_label->setText( labelText );
+        m_label->setFont( QFont{ "Times", 12 } );
+        auto rect = m_label->boundingRect();
+        rect.moveCenter( QPoint( 0, 0 ) );
+        m_label->setPos( rect.topLeft() );
+    }
+    addToGroup( m_label );
+    m_label->setZValue( 1 );
 
     m_block = new BlockItem( this );
     {
         QRectF rect{};
         rect.setX( 0 );
         rect.setY( 0 );
-        rect.setWidth( m_mainRectBase.width() );
+        rect.setWidth( m_mainRectBase.width()
+                       + m_label->boundingRect().width() );
         rect.setHeight( ( m_pinEdge + m_pinSpace ) * ( max > 0 ? max - 1 : 0 )
                         + m_mainRectBase.height() );
         rect.moveCenter( QPointF( 0, 0 ) );
@@ -28,6 +47,7 @@ FunctionBlockItem::FunctionBlockItem( int ins, int outs, QObject * parent )
                  Qt::DirectConnection );
     }
     addToGroup( m_block );
+    m_block->setZValue( 0 );
 
     QColor inPinColor = Qt::green;
     for ( int i = 0; i < ins; i++ )
@@ -72,6 +92,7 @@ FunctionBlockItem::FunctionBlockItem( int ins, int outs, QObject * parent )
             pinRect.moveCenter( QPointF( centerX, firstY + i * pinDistance ) );
             pin->setRect( pinRect );
             this->addToGroup( pin );
+            pin->setZValue( 2 );
             i++;
         }
     };
@@ -83,6 +104,7 @@ FunctionBlockItem::FunctionBlockItem( int ins, int outs, QObject * parent )
     QGraphicsItemGroup::setFiltersChildEvents( true );
     //    setAcceptHoverEvents( true );
 
+
     setFlag( QGraphicsItem::ItemIsMovable, true );
     setFlag( QGraphicsItem::ItemSendsScenePositionChanges, true );
 }
@@ -93,6 +115,11 @@ void FunctionBlockItem::setPinSelected( bool isIn,
 {
     ( isIn ? m_inPins[ index ] : m_outPins[ index ] )
             ->setSelected( isSelected );
+}
+
+QSizeF FunctionBlockItem::size() const
+{
+    return m_block->rect().size();
 }
 
 QPointF FunctionBlockItem::getEdgePinPoint(bool isIn, int pinIndex) const

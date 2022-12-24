@@ -8,7 +8,11 @@
 
 #include <QDebug>
 
-FunctionBlockDiagramWidget::FunctionBlockDiagramWidget( QWidget * parent )
+FunctionBlockDiagramWidget::FunctionBlockDiagramWidget(
+        int externalOutPinsCount,
+        int externalInPinsCount,
+        QVector< SFunctionInfo > const & functionInfoList,
+        QWidget * parent )
     : QWidget( parent )
 {
     auto * vBox = new QVBoxLayout( this );
@@ -38,22 +42,20 @@ FunctionBlockDiagramWidget::FunctionBlockDiagramWidget( QWidget * parent )
     m_graphicsView->setCacheMode( QGraphicsView::CacheBackground ); // Кэш фона
     m_graphicsView->setViewportUpdateMode( QGraphicsView::BoundingRectViewportUpdate );
 
-    m_functionGraph = new FunctionGraph{ this };
-    connect( m_functionGraph, &FunctionGraph::updated,
-             this, &FunctionBlockDiagramWidget::graphUpdated,
-             Qt::DirectConnection );
-    connect( m_functionGraph, &FunctionGraph::connectionChanged,
-             this, &FunctionBlockDiagramWidget::setConnection,
-             Qt::DirectConnection );
-
-    m_functionGraph->loadVertices(
-        {
-            { "Temperature", 3, 1 },
-            { "Motor", 2, 2 },
-            { "Pressure", 1, 1 },
-            { "Kek", 2, 2 },
-            { "Lol", 0, 0 },
-        } );
+    {
+        m_functionGraph = new FunctionGraph{
+                externalOutPinsCount,
+                externalInPinsCount,
+                this };
+        m_functionGraph->loadVertices( functionInfoList );
+        graphUpdated();
+        connect( m_functionGraph, &FunctionGraph::updated,
+                 this, &FunctionBlockDiagramWidget::graphUpdated,
+                 Qt::DirectConnection );
+        connect( m_functionGraph, &FunctionGraph::connectionChanged,
+                 this, &FunctionBlockDiagramWidget::setConnection,
+                 Qt::DirectConnection );
+    }
 }
 
 FunctionBlockDiagramWidget::~FunctionBlockDiagramWidget()
@@ -75,7 +77,8 @@ void FunctionBlockDiagramWidget::graphUpdated()
     for ( int i = m_blockMap.size(); i < vertices.size(); i++ )
     {
         auto & vertex = vertices[i];
-        auto * blockItem = new FunctionBlockItem( vertex.inPins.size(),
+        auto * blockItem = new FunctionBlockItem( vertex.name,
+                                                  vertex.inPins.size(),
                                                   vertex.outPins.size(),
                                                   this );
         position += QPointF( 0, blockItem->size().height() / 2 );

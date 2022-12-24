@@ -43,7 +43,11 @@ class FunctionBlockDiagramWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit FunctionBlockDiagramWidget(QWidget *parent = nullptr);
+    explicit FunctionBlockDiagramWidget(
+            int externalOutPinsCount,
+            int externalInPinsCount,
+            QVector< SFunctionInfo > const & functionList,
+            QWidget *parent = nullptr );
     ~FunctionBlockDiagramWidget() override;
 
 signals:
@@ -70,8 +74,10 @@ private:
     QGraphicsScene *                                m_scene{};
     QPointF                                         m_blockAppearPoint{ 100, 100 };
     QPointF                                         m_stepAppearPoint{ 0, 40 };
-    /** i of m_blockMap == i of CFunctionGraph->getVertices() */
+    /** m_blockMap[ i ] == CFunctionGraph->getVertices()[ i ] */
     QVector< FunctionBlockItem * >                  m_blockMap{};
+    FunctionBlockItem *                             m_externalOutBlock{};
+    FunctionBlockItem *                             m_externalInBlock{};
 
     // Model
     FunctionGraph *                                 m_functionGraph{};

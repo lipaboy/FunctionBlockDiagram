@@ -43,7 +43,9 @@ class FunctionGraph : public QObject
 {
     Q_OBJECT
 public:
-    explicit FunctionGraph( QObject * parent = nullptr );
+    explicit FunctionGraph( int externalOutPinsCount,
+                            int externalInPinsCount,
+                            QObject * parent = nullptr );
 
 public:
     void loadVertices( QVector< SFunctionInfo > funcInfos );
@@ -66,7 +68,9 @@ private:
     SFunctionPinIndexOpt & unzipOutIndex( SFunctionPinIndex const & index );
 
 private:
-    QVector< SFunctionNode >        m_vertices{};
+    QVector< SFunctionNode >            m_vertices{};
+    QVector< SFunctionPinIndexOpt >     m_externalOutPins{};
+    QVector< SFunctionPinIndexOpt >     m_externalInPins{};
 };
 
 #endif // CFUNCTIONGRAPH_H

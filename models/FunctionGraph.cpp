@@ -1,7 +1,11 @@
 #include "FunctionGraph.h"
 
-FunctionGraph::FunctionGraph( QObject * parent )
+FunctionGraph::FunctionGraph( int externalOutPinsCount,
+                              int externalInPinsCount,
+                              QObject * parent )
     : QObject( parent )
+    , m_externalOutPins( externalOutPinsCount, std::nullopt )
+    , m_externalInPins( externalInPinsCount, std::nullopt )
 {
 
 }

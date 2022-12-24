@@ -1,15 +1,14 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "models/FunctionGraph.h"
-
-#include "widgets/FunctionBlockDiagramWidget.h"
-
 #include <QMainWindow>
 #include <QGraphicsView>
 #include <QGraphicsRectItem>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
+
+class FunctionGraph;
+class FunctionBlockDiagramWidget;
 
 namespace Ui {
 class MainWindow;
@@ -24,7 +23,8 @@ public:
     ~MainWindow() = default;
 
 private:
-    FunctionBlockDiagramWidget *       m_fbd{};
+    FunctionGraph *                     m_functionGraph{};
+    FunctionBlockDiagramWidget *        m_fbd{};
     QVBoxLayout *                       m_vBox{};
 };
 
