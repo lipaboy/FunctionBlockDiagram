@@ -24,23 +24,29 @@ FunctionBlockDiagramWidget::FunctionBlockDiagramWidget(
     m_graphicsView->setScene( m_scene );
     m_scene->setSceneRect( 0, 0, sceneSize.width(), sceneSize.height() );
 
-    QBrush brush( Qt::black, Qt::SolidPattern );
-
-    /** TODO: установить точечный фон */
-//    QPixmap texture( 11, 11 );
-//    texture.fill( Qt::black );
-//    QImage image = texture.toImage();
-//    image.setPixel( texture.size().width() / 2, texture.size().height() / 2, Qt::white );
-//    texture.fromImage( image );
-
-//    brush.setTexture( texture );
-    m_graphicsView->setBackgroundBrush( brush );
-
     m_graphicsView->setRenderHint( QPainter::Antialiasing );
     m_graphicsView->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
     m_graphicsView->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
     m_graphicsView->setCacheMode( QGraphicsView::CacheBackground ); // Кэш фона
     m_graphicsView->setViewportUpdateMode( QGraphicsView::BoundingRectViewportUpdate );
+
+    /** Устанавливаем фон */
+    {
+        QPixmap texture( 21, 21 );
+        texture.fill( Qt::black );
+        QImage image = texture.toImage();
+        image.fill( Qt::black );
+        image.setPixel( image.width() / 2,
+                        image.height() / 2,
+                        QColor( Qt::white ).rgb() );
+
+        texture.convertFromImage( image );
+
+        QBrush brush( Qt::black, Qt::SolidPattern );
+        brush.setTexture( texture );
+
+        m_graphicsView->setBackgroundBrush( QBrush( texture ) );
+    }
 
     {
         m_functionGraph = new FunctionGraph{
