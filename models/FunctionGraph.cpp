@@ -54,6 +54,11 @@ void FunctionGraph::disconnectVertices( const SFunctionPinIndex & inVertex,
     }
 }
 
+SFunctionDiagram FunctionGraph::getDiagram() const
+{
+
+}
+
 SFunctionPinIndexOpt & FunctionGraph::unzipInIndex( const SFunctionPinIndex & index )
 {
     return m_vertices[ index.func ].inPins[ index.pin ];

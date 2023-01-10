@@ -74,7 +74,8 @@ FunctionBlockDiagramWidget::~FunctionBlockDiagramWidget()
 
 void FunctionBlockDiagramWidget::graphUpdated()
 {
-    auto vertices = m_functionGraph->getVertices();
+    auto diagramModel = m_functionGraph->getDiagram();
+    auto & vertices = diagramModel.functionNodes;
 
     QPointF position = m_blockMap.empty()
             ? m_blockAppearPoint
@@ -101,6 +102,15 @@ void FunctionBlockDiagramWidget::graphUpdated()
         }
         position += QPointF( 0, blockItem->size().height() / 2 )
                 + m_stepAppearPoint;
+    }
+
+
+    {
+        int outPinsCount = diagramModel.externalOutPins.size();
+        auto * blockItem = new FunctionBlockItem( "",
+                                                  0,
+                                                  outPinsCount,
+                                                  this );
     }
 
     // Подгрузка связей

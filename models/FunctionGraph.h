@@ -39,6 +39,24 @@ struct SFunctionNode
     QVector< SFunctionPinIndexOpt >     outPins{};
 };
 
+struct SFunctionDiagram
+{
+public:
+    SFunctionDiagram( const QVector< SFunctionNode > & functionNodes,
+                      int externalOutPinsIndex,
+                      int externalInPinsIndex )
+    {}
+
+    QVector< SFunctionNode > getFunctionNodes() const { return m_functionNodes; }
+    SFunctionNode getExternalOutPins() const { return m_functionNodes[ m_externalOutPins ]; }
+    SFunctionNode getExternalInPins() const { return m_functionNodes[ m_externalInPins ]; }
+
+private:
+    QVector< SFunctionNode >            m_functionNodes{};
+    int                                 m_externalOutPins{};
+    int                                 m_externalInPins{};
+};
+
 class FunctionGraph : public QObject
 {
     Q_OBJECT
@@ -55,7 +73,7 @@ public:
                              SFunctionPinIndex const & outVertex );
 
 public:
-    QVector< SFunctionNode > getVertices() const { return m_vertices; }
+    SFunctionDiagram getDiagram() const;
 
 signals:
     void updated();
