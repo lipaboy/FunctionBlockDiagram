@@ -24,6 +24,8 @@ public:
 
 public:
     void setPinSelected(bool isIn, int index, bool isSelected );
+    void setSize( const QSizeF & newSize );
+    void setTopLeftPos( const QPointF & newPos );
 
 public:
     QSizeF size() const;
@@ -36,11 +38,14 @@ signals:
 protected:
     QVariant itemChange( QGraphicsItem::GraphicsItemChange change,
                          const QVariant & value ) override;
+    QRectF boundingRect() const override;
 
 private:
     void mousePressEvent( QGraphicsSceneMouseEvent * event ) override;
     void mouseReleaseEvent( QGraphicsSceneMouseEvent * event ) override;
     void hoverEnterEvent( QGraphicsSceneHoverEvent * event ) override;
+
+    void recalcItemsPos();
 
 private:
     BlockItem *                 m_block{};

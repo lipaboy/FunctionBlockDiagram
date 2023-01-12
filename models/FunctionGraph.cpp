@@ -4,10 +4,21 @@ FunctionGraph::FunctionGraph( int externalOutPinsCount,
                               int externalInPinsCount,
                               QObject * parent )
     : QObject( parent )
-    , m_externalOutPins( externalOutPinsCount, std::nullopt )
-    , m_externalInPins( externalInPinsCount, std::nullopt )
 {
-
+    if ( externalOutPinsCount > 0 )
+    {
+        SFunctionNode node{};
+        node.outPins.resize( externalOutPinsCount );
+        m_functionNodes.push_back( node );
+        m_externalOutPinsInd = m_functionNodes.size() - 1;
+    }
+    if ( externalInPinsCount > 0 )
+    {
+        SFunctionNode node{};
+        node.inPins.resize( externalInPinsCount );
+        m_functionNodes.push_back( node );
+        m_externalInPinsInd = m_functionNodes.size() - 1;
+    }
 }
 
 void FunctionGraph::loadVertices( QVector< SFunctionInfo > funcInfos )
@@ -18,7 +29,7 @@ void FunctionGraph::loadVertices( QVector< SFunctionInfo > funcInfos )
         node.name = info.funcName;
         node.inPins.resize( info.inputPinCount );
         node.outPins.resize( info.outputPinCount );
-        m_vertices.push_back( node );
+        m_functionNodes.push_back( node );
     }
 
     emit updated();
@@ -54,17 +65,19 @@ void FunctionGraph::disconnectVertices( const SFunctionPinIndex & inVertex,
     }
 }
 
-SFunctionDiagram FunctionGraph::getDiagram() const
+SFunctionPinIndexOpt & FunctionGraph::rget( bool isIn,
+                                            const SFunctionPinIndex & index)
 {
-
+    return isIn ? m_functionNodes[ index.func ].inPins[ index.pin ]
+            : m_functionNodes[ index.func ].outPins[ index.pin ];
 }
 
 SFunctionPinIndexOpt & FunctionGraph::unzipInIndex( const SFunctionPinIndex & index )
 {
-    return m_vertices[ index.func ].inPins[ index.pin ];
+    return rget( true, index );
 }
 
 SFunctionPinIndexOpt &FunctionGraph::unzipOutIndex(const SFunctionPinIndex &index)
 {
-    return m_vertices[ index.func ].outPins[ index.pin ];
+    return rget( false, index );
 }

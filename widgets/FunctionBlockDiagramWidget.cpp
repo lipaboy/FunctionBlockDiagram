@@ -19,7 +19,7 @@ FunctionBlockDiagramWidget::FunctionBlockDiagramWidget(
     m_graphicsView = new QGraphicsView{};
     vBox->addWidget( m_graphicsView );
 
-    QSize sceneSize { 1000, 800 };
+    QSize sceneSize { 1000, 700 };
     m_scene = new QGraphicsScene{};
     m_graphicsView->setScene( m_scene );
     m_scene->setSceneRect( 0, 0, sceneSize.width(), sceneSize.height() );
@@ -32,13 +32,14 @@ FunctionBlockDiagramWidget::FunctionBlockDiagramWidget(
 
     /** Устанавливаем фон */
     {
-        QPixmap texture( 21, 21 );
+        int textureSize = 31;
+        QPixmap texture( textureSize, textureSize );
         texture.fill( Qt::black );
         QImage image = texture.toImage();
         image.fill( Qt::black );
         image.setPixel( image.width() / 2,
                         image.height() / 2,
-                        QColor( Qt::white ).rgb() );
+                        QColor( Qt::red ).rgb() );
 
         texture.convertFromImage( image );
 
@@ -74,13 +75,13 @@ FunctionBlockDiagramWidget::~FunctionBlockDiagramWidget()
 
 void FunctionBlockDiagramWidget::graphUpdated()
 {
-    auto diagramModel = m_functionGraph->getDiagram();
-    auto & vertices = diagramModel.functionNodes;
+    auto vertices = m_functionGraph->getFunctionNodes();
 
     QPointF position = m_blockMap.empty()
             ? m_blockAppearPoint
             : m_blockMap.back()->pos() + QPointF( 0, m_blockMap.back()->size().height() )
               + m_stepAppearPoint;
+
     for ( int i = m_blockMap.size(); i < vertices.size(); i++ )
     {
         auto & vertex = vertices[i];
@@ -88,29 +89,49 @@ void FunctionBlockDiagramWidget::graphUpdated()
                                                   vertex.inPins.size(),
                                                   vertex.outPins.size(),
                                                   this );
-        position += QPointF( 0, blockItem->size().height() / 2 );
+
+        if ( i != m_functionGraph->getExternalOutPinsId()
+             && i != m_functionGraph->getExternalInPinsId() )
         {
-            m_blockMap.push_back( blockItem );
-            m_scene->addItem( blockItem );
-            blockItem->setPos( position );
-            connect( blockItem, & FunctionBlockItem::pinClicked,
-                     this,
-                     [ this, i ] ( bool isIn, int pinIndex ) -> void
-            {
-                blockPinClicked( isIn, i, pinIndex );
-            }, Qt::DirectConnection );
+            position += QPointF( 0, blockItem->size().height() / 2 );
         }
+
+        m_blockMap.push_back( blockItem );
+        m_scene->addItem( blockItem );
+        blockItem->setPos( position );
+        connect( blockItem, & FunctionBlockItem::pinClicked,
+                 this,
+                 [ this, i ] ( bool isIn, int pinIndex ) -> void
+        {
+            blockPinClicked( isIn, i, pinIndex );
+        }, Qt::DirectConnection );
+
+        if ( i != m_functionGraph->getExternalOutPinsId()
+             && i != m_functionGraph->getExternalInPinsId() )
+        {
         position += QPointF( 0, blockItem->size().height() / 2 )
                 + m_stepAppearPoint;
+        }
     }
 
+    {
+        int outPinsId = m_functionGraph->getExternalOutPinsId();
+        auto * outPinBlock = m_blockMap[ outPinsId ];
+        outPinBlock->setSize( QSize( outPinBlock->size().width(),
+                                     m_scene->sceneRect().height() ) );
+        outPinBlock->setTopLeftPos( QPointF( 0, 0 ) );
+    }
 
     {
-        int outPinsCount = diagramModel.externalOutPins.size();
-        auto * blockItem = new FunctionBlockItem( "",
-                                                  0,
-                                                  outPinsCount,
-                                                  this );
+        int inPinsId = m_functionGraph->getExternalInPinsId();
+        auto * inPinBlock = m_blockMap[ inPinsId ];
+        inPinBlock->setSize( QSize( inPinBlock->size().width(),
+                                    m_scene->sceneRect().height() ) );
+        inPinBlock->setTopLeftPos(
+                    QPointF(
+                        m_scene->sceneRect().size().width()
+                        - inPinBlock->size().width(),
+                        0 ) );
     }
 
     // Подгрузка связей
@@ -192,6 +213,7 @@ void FunctionBlockDiagramWidget::setConnection( const SFunctionPinIndex & inFunc
             auto * lineItem = new ConnectionItem( nullptr );
             m_linesMap.insert( keyCon, lineItem );
             m_scene->addItem( lineItem );
+            lineItem->setZValue( -2 );
             auto * inBlockItem = m_blockMap[ inFuncIndex.func ];
             auto * outBlockItem = m_blockMap[ outFuncIndex.func ];
             lineItem->setLine(

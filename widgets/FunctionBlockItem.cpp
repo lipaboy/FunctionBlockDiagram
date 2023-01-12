@@ -12,31 +12,16 @@ FunctionBlockItem::FunctionBlockItem( const QString & labelText,
     : QObject( parent )
     , QGraphicsItemGroup()
 {
-    int max = std::max( ins, outs );
-
-
     m_label = new QGraphicsSimpleTextItem( this );
     {
         m_label->setText( labelText );
         m_label->setFont( QFont{ "Times", 12 } );
-        auto rect = m_label->boundingRect();
-        rect.moveCenter( QPoint( 0, 0 ) );
-        m_label->setPos( rect.topLeft() );
     }
     addToGroup( m_label );
     m_label->setZValue( 1 );
 
     m_block = new BlockItem( this );
     {
-        QRectF rect{};
-        rect.setX( 0 );
-        rect.setY( 0 );
-        rect.setWidth( m_mainRectBase.width()
-                       + m_label->boundingRect().width() );
-        rect.setHeight( ( m_pinEdge + m_pinSpace ) * ( max > 0 ? max - 1 : 0 )
-                        + m_mainRectBase.height() );
-        rect.moveCenter( QPointF( 0, 0 ) );
-        m_block->setRect( rect );
         m_block->setBrush( Qt::gray );
         QPen pen{};
         pen.setColor( Qt::black );
@@ -60,6 +45,7 @@ FunctionBlockItem::FunctionBlockItem( const QString & labelText,
         {
             emit this->pinClicked( true, index );
         }, Qt::DirectConnection );
+        pinItem->setZValue( 2 );
     }
 
     QColor outPinColor = Qt::red;
@@ -73,32 +59,10 @@ FunctionBlockItem::FunctionBlockItem( const QString & labelText,
         {
             emit this->pinClicked( false, index );
         }, Qt::DirectConnection );
+        pinItem->setZValue( 2 );
     }
 
-    auto drawPinsFn =
-            [ this ]
-            (
-            bool isLeft,
-            const QVector< PinItem * > & pinItems ) -> void
-    {
-        qreal centerX = ( isLeft ? -1 : 1 ) * m_block->rect().width() / 2;
-
-        int i = 1;
-        qreal pinDistance = m_block->rect().height() / ( pinItems.size() + 1 );
-        qreal firstY = m_block->rect().y();
-        QRectF pinRect{ 0, 0, m_pinEdge, m_pinEdge };
-        for ( auto * pin : pinItems )
-        {
-            pinRect.moveCenter( QPointF( centerX, firstY + i * pinDistance ) );
-            pin->setRect( pinRect );
-            this->addToGroup( pin );
-            pin->setZValue( 2 );
-            i++;
-        }
-    };
-
-    drawPinsFn( true, m_inPins );
-    drawPinsFn( false, m_outPins );
+    recalcItemsPos();
 
     QGraphicsItemGroup::setHandlesChildEvents( false );
     QGraphicsItemGroup::setFiltersChildEvents( true );
@@ -109,6 +73,57 @@ FunctionBlockItem::FunctionBlockItem( const QString & labelText,
     setFlag( QGraphicsItem::ItemSendsScenePositionChanges, true );
 }
 
+void FunctionBlockItem::recalcItemsPos()
+{
+    int maxPins = std::max< int >( m_inPins.size(), m_outPins.size() );
+
+    {
+        auto rect = m_label->boundingRect();
+        rect.moveCenter( QPoint( 0, 0 ) );
+        m_label->setPos( rect.topLeft() );
+    }
+
+    {
+        QRectF rect{};
+        rect.setX( 0 );
+        rect.setY( 0 );
+        rect.setWidth( m_mainRectBase.width()
+                       + m_label->boundingRect().width() );
+        rect.setHeight( ( m_pinEdge + m_pinSpace )
+                            * ( maxPins > 0 ? maxPins - 1 : 0 )
+                        + m_mainRectBase.height() );
+        rect.moveCenter( QPointF( 0, 0 ) );
+        m_block->setRect( rect );
+    }
+
+    auto drawPinsFn =
+            [ this ]
+            (
+            bool isLeft,
+            const QVector< PinItem * > & pinItems ) -> void
+    {
+        qreal centerX =
+                ( isLeft ? -1 : 1 ) * m_block->rect().width() / 2;
+
+        int i = 1;
+        qreal pinDistance = m_block->rect().height()
+                / ( pinItems.size() + 1 );
+        qreal firstY = m_block->rect().y();
+        QRectF pinRect{ 0, 0, m_pinEdge, m_pinEdge };
+        for ( auto * pin : pinItems )
+        {
+            pinRect.moveCenter( QPointF( centerX,
+                                         firstY + i * pinDistance ) );
+            pin->setRect( pinRect );
+            this->addToGroup( pin );
+            i++;
+        }
+    };
+
+    drawPinsFn( true, m_inPins );
+    drawPinsFn( false, m_outPins );
+}
+
 void FunctionBlockItem::setPinSelected( bool isIn,
                                         int index,
                                         bool isSelected )
@@ -117,9 +132,30 @@ void FunctionBlockItem::setPinSelected( bool isIn,
             ->setSelected( isSelected );
 }
 
+void FunctionBlockItem::setSize( const QSizeF & newSize )
+{
+    m_mainRectBase.rwidth() = newSize.width() - m_pinEdge;
+
+    int maxPins = std::max< int >( m_inPins.size(), m_outPins.size() );
+    if ( maxPins > 1 )
+    {
+        m_pinSpace = ( newSize.height() - m_mainRectBase.height() )
+                / ( maxPins - 1 ) - m_pinEdge;
+    }
+
+    recalcItemsPos();
+}
+
+void FunctionBlockItem::setTopLeftPos(const QPointF &newPos)
+{
+    setPos( newPos.x() - size().width() / 2,
+            newPos.y() + size().height() / 2 );
+}
+
 QSizeF FunctionBlockItem::size() const
 {
-    return m_block->rect().size();
+    return QSizeF( m_block->rect().size().width() + m_pinEdge,
+                   m_block->rect().size().height() );
 }
 
 QPointF FunctionBlockItem::getEdgePinPoint(bool isIn, int pinIndex) const
@@ -149,6 +185,14 @@ QVariant FunctionBlockItem::itemChange( QGraphicsItem::GraphicsItemChange change
         emit positionChanged();
     }
     return QGraphicsItem::itemChange( change, value );
+}
+
+QRectF FunctionBlockItem::boundingRect() const
+{
+    // must be overloaded, otherwise the boundingrect will only be actualized on
+    // additem is actualized. This leads to the fact that the boundingrect
+    // will not close around the word items after e.g., moving them.
+    return childrenBoundingRect();
 }
 
 void FunctionBlockItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
@@ -230,3 +274,4 @@ void FunctionBlockItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 //    }
     QGraphicsItemGroup::hoverEnterEvent( event );
 }
+
