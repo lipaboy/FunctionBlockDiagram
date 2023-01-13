@@ -9,15 +9,15 @@ FunctionGraph::FunctionGraph( int externalOutPinsCount,
     {
         SFunctionNode node{};
         node.outPins.resize( externalOutPinsCount );
+        node.id = m_externalOutPinsInd = m_functionNodes.size();
         m_functionNodes.push_back( node );
-        m_externalOutPinsInd = m_functionNodes.size() - 1;
     }
     if ( externalInPinsCount > 0 )
     {
         SFunctionNode node{};
         node.inPins.resize( externalInPinsCount );
+        node.id = m_externalInPinsInd = m_functionNodes.size();
         m_functionNodes.push_back( node );
-        m_externalInPinsInd = m_functionNodes.size() - 1;
     }
 }
 
@@ -29,6 +29,7 @@ void FunctionGraph::loadVertices( QVector< SFunctionInfo > funcInfos )
         node.name = info.funcName;
         node.inPins.resize( info.inputPinCount );
         node.outPins.resize( info.outputPinCount );
+        node.id = m_functionNodes.size();
         m_functionNodes.push_back( node );
     }
 
@@ -40,7 +41,7 @@ void FunctionGraph::connectVertices( const SFunctionPinIndex & inVertex,
 {
     SFunctionPinIndexOpt & rInPin = unzipInIndex( inVertex );
     SFunctionPinIndexOpt & rOutPin = unzipOutIndex( outVertex );
-    if ( inVertex.func != outVertex.func
+    if ( inVertex.funcId != outVertex.funcId
          && ! rInPin.has_value()
          && ! rOutPin.has_value() )
     {
@@ -68,8 +69,8 @@ void FunctionGraph::disconnectVertices( const SFunctionPinIndex & inVertex,
 SFunctionPinIndexOpt & FunctionGraph::rget( bool isIn,
                                             const SFunctionPinIndex & index)
 {
-    return isIn ? m_functionNodes[ index.func ].inPins[ index.pin ]
-            : m_functionNodes[ index.func ].outPins[ index.pin ];
+    return isIn ? m_functionNodes[ index.funcId ].inPins[ index.pin ]
+            : m_functionNodes[ index.funcId ].outPins[ index.pin ];
 }
 
 SFunctionPinIndexOpt & FunctionGraph::unzipInIndex( const SFunctionPinIndex & index )

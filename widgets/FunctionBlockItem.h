@@ -9,6 +9,8 @@
 
 #include <optional>
 
+#include "models/FunctionGraph.h"
+
 class BlockItem;
 class PinItem;
 
@@ -23,16 +25,19 @@ public:
     ~FunctionBlockItem() override = default;
 
 public:
-    void setPinSelected(bool isIn, int index, bool isSelected );
+    void setPinSelected( SFunctionPinIndex::EPinType type,
+                         int index,
+                         bool isSelected );
     void setSize( const QSizeF & newSize );
     void setTopLeftPos( const QPointF & newPos );
 
 public:
     QSizeF size() const;
-    QPointF getEdgePinPoint(bool isIn, int pinIndex ) const;
+    QPointF getEdgePinPoint( SFunctionPinIndex::EPinType type,
+                             int pinIndex ) const;
 
 signals:
-    void pinClicked( bool isIn, int pinIndex );
+    void pinClicked( SFunctionPinIndex::EPinType type, int pinIndex );
     void positionChanged();
 
 protected:

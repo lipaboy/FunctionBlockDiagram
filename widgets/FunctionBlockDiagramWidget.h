@@ -35,8 +35,8 @@ struct SConnection
 
 inline size_t qHash( const SConnection & key, size_t seed )
 {
-    return qHash( key.inFunc.func, seed ) ^ size_t( key.inFunc.pin )
-            ^ qHash( key.outFunc.func, seed ) ^ size_t( key.outFunc.pin );
+    return qHash( key.inFunc.funcId, seed ) ^ size_t( key.inFunc.pin )
+            ^ qHash( key.outFunc.funcId, seed ) ^ size_t( key.outFunc.pin );
 }
 
 class FunctionBlockDiagramWidget : public QWidget
@@ -55,13 +55,13 @@ signals:
 public slots:
     void graphUpdated();
 
-    void blockPinClicked( bool isIn, int blockIndex, int pinIndex );
+    void blockPinClicked( SFunctionPinIndex funcPinIndex );
 
 protected:
     void keyPressEvent( QKeyEvent * event ) override;
 
 private:
-    void setPinSelected( bool isIn, const SFunctionPinIndex & pairIndex, bool isSelected );
+    void setPinSelected(const SFunctionPinIndex & pairIndex, bool isSelected );
 
 private slots:
     void setConnection( const SFunctionPinIndex & inBlock,
@@ -75,7 +75,7 @@ private:
     QPointF                                         m_blockAppearPoint{ 100, 100 };
     QPointF                                         m_stepAppearPoint{ 0, 40 };
     /** m_blockMap[ i ] == CFunctionGraph->getVertices()[ i ] */
-    QVector< FunctionBlockItem * >                  m_blockMap{};
+    QHash< int, FunctionBlockItem * >               m_blockMap{};
     FunctionBlockItem *                             m_externalOutBlock{};
     FunctionBlockItem *                             m_externalInBlock{};
 

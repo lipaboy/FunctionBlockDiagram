@@ -5,7 +5,46 @@
 #include <QString>
 #include <QVector>
 
-#include "SFunctionDiagram.h"
+struct SFunctionPinIndex
+{
+    enum EPinType
+    {
+        OUT = 0,
+        IN,
+    };
+
+    EPinType pinType{};
+    int funcId{};
+    int pin{};
+
+    SFunctionPinIndex()
+    {}
+    SFunctionPinIndex( EPinType type, int functionId, int pinIndex )
+        : pinType( type ), funcId( functionId ), pin( pinIndex )
+    {}
+
+    bool operator==( SFunctionPinIndex const & other ) const
+    {
+        return pinType == other.pinType
+                && funcId == other.funcId
+                && pin == other.pin;
+    }
+    bool operator!=( SFunctionPinIndex const & other ) const
+    {
+        return ! ( *this == other );
+    }
+};
+
+using SFunctionPinIndexOpt = std::optional< SFunctionPinIndex >;
+
+struct SFunctionNode
+{
+    int                                 id{};
+    QString                             name{};
+    /** Связь либо есть, либо её нет. Но pin существует в любом случае */
+    QVector< SFunctionPinIndexOpt >     inPins{};
+    QVector< SFunctionPinIndexOpt >     outPins{};
+};
 
 struct SFunctionInfo
 {

@@ -43,7 +43,7 @@ FunctionBlockItem::FunctionBlockItem( const QString & labelText,
                  this,
                  [ this, index = m_inPins.size() - 1 ] () -> void
         {
-            emit this->pinClicked( true, index );
+            emit this->pinClicked( SFunctionPinIndex::IN, index );
         }, Qt::DirectConnection );
         pinItem->setZValue( 2 );
     }
@@ -57,7 +57,7 @@ FunctionBlockItem::FunctionBlockItem( const QString & labelText,
                  this,
                  [ this, index = m_outPins.size() - 1 ] () -> void
         {
-            emit this->pinClicked( false, index );
+            emit this->pinClicked( SFunctionPinIndex::OUT, index );
         }, Qt::DirectConnection );
         pinItem->setZValue( 2 );
     }
@@ -124,11 +124,12 @@ void FunctionBlockItem::recalcItemsPos()
     drawPinsFn( false, m_outPins );
 }
 
-void FunctionBlockItem::setPinSelected( bool isIn,
+void FunctionBlockItem::setPinSelected( SFunctionPinIndex::EPinType type,
                                         int index,
                                         bool isSelected )
 {
-    ( isIn ? m_inPins[ index ] : m_outPins[ index ] )
+    ( type == SFunctionPinIndex::IN
+            ? m_inPins[ index ] : m_outPins[ index ] )
             ->setSelected( isSelected );
 }
 
@@ -158,9 +159,10 @@ QSizeF FunctionBlockItem::size() const
                    m_block->rect().size().height() );
 }
 
-QPointF FunctionBlockItem::getEdgePinPoint(bool isIn, int pinIndex) const
+QPointF FunctionBlockItem::getEdgePinPoint(
+        SFunctionPinIndex::EPinType type, int pinIndex) const
 {
-    if ( isIn )
+    if ( type == SFunctionPinIndex::IN )
     {
         auto * pin = m_inPins[ pinIndex ];
         return mapToScene(

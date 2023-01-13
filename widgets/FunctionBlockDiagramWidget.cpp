@@ -75,42 +75,43 @@ FunctionBlockDiagramWidget::~FunctionBlockDiagramWidget()
 
 void FunctionBlockDiagramWidget::graphUpdated()
 {
-    auto vertices = m_functionGraph->getFunctionNodes();
+    auto nodeList = m_functionGraph->getFunctionNodes();
 
-    QPointF position = m_blockMap.empty()
-            ? m_blockAppearPoint
-            : m_blockMap.back()->pos() + QPointF( 0, m_blockMap.back()->size().height() )
-              + m_stepAppearPoint;
-
-    for ( int i = m_blockMap.size(); i < vertices.size(); i++ )
+    QPointF position = m_blockAppearPoint;
+    for ( auto & node : nodeList )
     {
-        auto & vertex = vertices[i];
-        auto * blockItem = new FunctionBlockItem( vertex.name,
-                                                  vertex.inPins.size(),
-                                                  vertex.outPins.size(),
+        if ( m_blockMap.contains( node.id ) )
+        {
+            continue;
+        }
+
+        auto * blockItem = new FunctionBlockItem( node.name,
+                                                  node.inPins.size(),
+                                                  node.outPins.size(),
                                                   this );
 
-        if ( i != m_functionGraph->getExternalOutPinsId()
-             && i != m_functionGraph->getExternalInPinsId() )
+        if ( node.id != m_functionGraph->getExternalOutPinsId()
+             && node.id != m_functionGraph->getExternalInPinsId() )
         {
             position += QPointF( 0, blockItem->size().height() / 2 );
         }
 
-        m_blockMap.push_back( blockItem );
+        m_blockMap.insert( node.id, blockItem );
         m_scene->addItem( blockItem );
         blockItem->setPos( position );
         connect( blockItem, & FunctionBlockItem::pinClicked,
                  this,
-                 [ this, i ] ( bool isIn, int pinIndex ) -> void
+                 [ this, funcId = node.id ]
+                 ( SFunctionPinIndex::EPinType type, int pinIndex ) -> void
         {
-            blockPinClicked( isIn, i, pinIndex );
+            blockPinClicked( SFunctionPinIndex( type, funcId, pinIndex ) );
         }, Qt::DirectConnection );
 
-        if ( i != m_functionGraph->getExternalOutPinsId()
-             && i != m_functionGraph->getExternalInPinsId() )
+        if ( node.id != m_functionGraph->getExternalOutPinsId()
+             && node.id != m_functionGraph->getExternalInPinsId() )
         {
-        position += QPointF( 0, blockItem->size().height() / 2 )
-                + m_stepAppearPoint;
+            position += QPointF( 0, blockItem->size().height() / 2 )
+                    + m_stepAppearPoint;
         }
     }
 
@@ -133,39 +134,23 @@ void FunctionBlockDiagramWidget::graphUpdated()
                         - inPinBlock->size().width(),
                         0 ) );
     }
-
-    // Подгрузка связей
-//    for ( int i = 0; i < vertices.size(); i++ )
-//    {
-//        auto & vertex = vertices[ i ];
-//        for ( int j = 0; j < vertex.inputPins.size(); j++ )
-//        {
-//            auto & inPin = vertex.inputPins[ j ];
-//            if ( inPin.has_value() )
-//            {
-//                setConnection( inPin.value(),
-//                               SFunctionPinIndex{ i, j }, true );
-//            }
-//        }
-//    }
 }
 
-void FunctionBlockDiagramWidget::blockPinClicked( bool isIn,
-                                                  int blockIndex,
-                                                  int pinIndex )
+void FunctionBlockDiagramWidget::blockPinClicked( SFunctionPinIndex funcPinIndex )
 {
-    auto & pinSelected = ( isIn ) ? m_inPinSelected : m_outPinSelected;
+    auto & pinSelected = ( funcPinIndex.pinType == SFunctionPinIndex::IN )
+            ? m_inPinSelected : m_outPinSelected;
     if ( pinSelected.has_value() )
     {
-        setPinSelected( isIn, pinSelected.value(), false );
+        setPinSelected( pinSelected.value(), false );
     }
-    pinSelected = SFunctionPinIndex{ blockIndex, pinIndex };
-    setPinSelected( isIn, pinSelected.value(), true );
+    pinSelected = funcPinIndex;
+    setPinSelected( pinSelected.value(), true );
 
     if ( m_inPinSelected.has_value() && m_outPinSelected.has_value() )
     {
-        setPinSelected( true, m_inPinSelected.value(), false );
-        setPinSelected( false, m_outPinSelected.value(), false );
+        setPinSelected( m_inPinSelected.value(), false );
+        setPinSelected( m_outPinSelected.value(), false );
 
         m_functionGraph->connectVertices( m_inPinSelected.value(),
                                           m_outPinSelected.value() );
@@ -190,11 +175,12 @@ void FunctionBlockDiagramWidget::keyPressEvent(QKeyEvent *event)
 }
 
 void FunctionBlockDiagramWidget::setPinSelected(
-        bool isIn,
-        const SFunctionPinIndex & pairIndex,
+        const SFunctionPinIndex & funcPinIndex,
         bool isSelected )
 {
-    m_blockMap[ pairIndex.func ]->setPinSelected( isIn, pairIndex.pin, isSelected );
+    m_blockMap[ funcPinIndex.funcId ]->setPinSelected( funcPinIndex.pinType,
+                                                       funcPinIndex.pin,
+                                                       isSelected );
 }
 
 void FunctionBlockDiagramWidget::setConnection( const SFunctionPinIndex & inFuncIndex,
@@ -214,12 +200,14 @@ void FunctionBlockDiagramWidget::setConnection( const SFunctionPinIndex & inFunc
             m_linesMap.insert( keyCon, lineItem );
             m_scene->addItem( lineItem );
             lineItem->setZValue( -2 );
-            auto * inBlockItem = m_blockMap[ inFuncIndex.func ];
-            auto * outBlockItem = m_blockMap[ outFuncIndex.func ];
+            auto * inBlockItem = m_blockMap[ inFuncIndex.funcId ];
+            auto * outBlockItem = m_blockMap[ outFuncIndex.funcId ];
             lineItem->setLine(
                         QLineF(
-                            inBlockItem->getEdgePinPoint( true, inFuncIndex.pin ),
-                            outBlockItem->getEdgePinPoint( false, outFuncIndex.pin )
+                            inBlockItem->getEdgePinPoint( SFunctionPinIndex::IN,
+                                                          inFuncIndex.pin ),
+                            outBlockItem->getEdgePinPoint( SFunctionPinIndex::OUT,
+                                                           outFuncIndex.pin )
                             )
                         );
 
@@ -251,7 +239,7 @@ void FunctionBlockDiagramWidget::setConnection( const SFunctionPinIndex & inFunc
                      pin = inFuncIndex.pin ] () -> void
             {
                 auto line = lineItem->line();
-                line.setP1( blockItem->getEdgePinPoint( true, pin ) );
+                line.setP1( blockItem->getEdgePinPoint( SFunctionPinIndex::IN, pin ) );
                 lineItem->setLine( line );
             }, Qt::DirectConnection );
 
@@ -262,7 +250,7 @@ void FunctionBlockDiagramWidget::setConnection( const SFunctionPinIndex & inFunc
                      pin = outFuncIndex.pin ] () -> void
             {
                 auto line = lineItem->line();
-                line.setP2( blockItem->getEdgePinPoint( false, pin ) );
+                line.setP2( blockItem->getEdgePinPoint( SFunctionPinIndex::OUT, pin ) );
                 lineItem->setLine( line );
             }, Qt::DirectConnection );
         }
