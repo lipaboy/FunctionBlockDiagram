@@ -19,20 +19,21 @@ FunctionBlockDiagramWidget::FunctionBlockDiagramWidget(
     m_graphicsView = new QGraphicsView{};
     vBox->addWidget( m_graphicsView );
 
-    QSize sceneSize { 1000, 700 };
+    QSize sceneSize { 1500, 1000 };
     m_scene = new QGraphicsScene{};
     m_graphicsView->setScene( m_scene );
     m_scene->setSceneRect( 0, 0, sceneSize.width(), sceneSize.height() );
 
     m_graphicsView->setRenderHint( QPainter::Antialiasing );
-    m_graphicsView->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-    m_graphicsView->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
     m_graphicsView->setCacheMode( QGraphicsView::CacheBackground ); // Кэш фона
     m_graphicsView->setViewportUpdateMode( QGraphicsView::BoundingRectViewportUpdate );
+    m_graphicsView->setDragMode( QGraphicsView::DragMode::ScrollHandDrag );
+    m_graphicsView->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+    m_graphicsView->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
 
     /** Устанавливаем фон */
     {
-        int textureSize = 31;
+        int textureSize = 32;
         QPixmap texture( textureSize, textureSize );
         texture.fill( Qt::black );
         QImage image = texture.toImage();
@@ -54,14 +55,14 @@ FunctionBlockDiagramWidget::FunctionBlockDiagramWidget(
                 externalOutPinsCount,
                 externalInPinsCount,
                 this };
-        m_functionGraph->loadVertices( functionInfoList );
-        graphUpdated();
         connect( m_functionGraph, &FunctionGraph::updated,
                  this, &FunctionBlockDiagramWidget::graphUpdated,
                  Qt::DirectConnection );
         connect( m_functionGraph, &FunctionGraph::connectionChanged,
                  this, &FunctionBlockDiagramWidget::setConnection,
                  Qt::DirectConnection );
+
+        m_functionGraph->loadVertices( functionInfoList );
     }
 }
 
@@ -115,23 +116,31 @@ void FunctionBlockDiagramWidget::graphUpdated()
         }
     }
 
+    QRect viewportRect( 0,
+                        0,
+                        m_graphicsView->viewport()->width(),
+                        m_graphicsView->viewport()->height() );
+    QRectF visibleSceneRect =
+            m_graphicsView->mapToScene( viewportRect ).boundingRect();
     {
         int outPinsId = m_functionGraph->getExternalOutPinsId();
         auto * outPinBlock = m_blockMap[ outPinsId ];
         outPinBlock->setSize( QSize( outPinBlock->size().width(),
-                                     m_scene->sceneRect().height() ) );
-        outPinBlock->setTopLeftPos( QPointF( 0, 0 ) );
+                                     visibleSceneRect.height() ) );
+
+        outPinBlock->setTopLeftPos( m_graphicsView->viewport()->pos() + QPointF( 100, 0 ) );
     }
 
     {
         int inPinsId = m_functionGraph->getExternalInPinsId();
         auto * inPinBlock = m_blockMap[ inPinsId ];
         inPinBlock->setSize( QSize( inPinBlock->size().width(),
-                                    m_scene->sceneRect().height() ) );
+                                    visibleSceneRect.height() ) );
+
         inPinBlock->setTopLeftPos(
                     QPointF(
-                        m_scene->sceneRect().size().width()
-                        - inPinBlock->size().width(),
+                        visibleSceneRect.right()
+                         - inPinBlock->size().width(),
                         0 ) );
     }
 }

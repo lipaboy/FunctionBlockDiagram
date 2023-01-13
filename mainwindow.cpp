@@ -13,10 +13,11 @@ MainWindow::MainWindow(QWidget *parent) :
         { "Kek", 2, 2 },
     };
 
+    QSize size( 1000, 700 );
+    this->resize( size );
+
     m_fbd = new FunctionBlockDiagramWidget( 5, 5, functionInfoList, this );
     this->setCentralWidget( m_fbd );
 
-    QSize size( 1200, 800 );
-    this->resize( size );
 }
 
