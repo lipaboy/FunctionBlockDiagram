@@ -50,6 +50,9 @@ public:
             QWidget *parent = nullptr );
     ~FunctionBlockDiagramWidget() override;
 
+public:
+    decltype(auto) view() { return m_view; }
+
 signals:
 
 public slots:
@@ -59,6 +62,7 @@ public slots:
 
 protected:
     void keyPressEvent( QKeyEvent * event ) override;
+    void resizeEvent( QResizeEvent * event ) override;
 
 private:
     void setPinSelected(const SFunctionPinIndex & pairIndex, bool isSelected );
@@ -70,9 +74,9 @@ private slots:
 
 private:
     // View
-    QGraphicsView *                                 m_graphicsView{};
+    QGraphicsView *                                 m_view{};
     QGraphicsScene *                                m_scene{};
-    QPointF                                         m_blockAppearPoint{ 100, 100 };
+    QPointF                                         m_blockAppearPoint{};
     QPointF                                         m_stepAppearPoint{ 0, 40 };
     /** m_blockMap[ i ] == CFunctionGraph->getVertices()[ i ] */
     QHash< int, FunctionBlockItem * >               m_blockMap{};

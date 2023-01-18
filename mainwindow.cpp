@@ -17,7 +17,13 @@ MainWindow::MainWindow(QWidget *parent) :
     this->resize( size );
 
     m_fbd = new FunctionBlockDiagramWidget( 5, 5, functionInfoList, this );
+    qDebug() << m_fbd->view()->size();
+    qDebug() << m_fbd->view()->viewport()->size();
+    qDebug() << m_fbd->view()->sceneRect().size();
     this->setCentralWidget( m_fbd );
+    qDebug() << m_fbd->view()->size();
+    qDebug() << m_fbd->view()->viewport()->size();
+    qDebug() << m_fbd->view()->sceneRect().size();
 
 }
 
