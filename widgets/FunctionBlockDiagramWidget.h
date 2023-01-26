@@ -60,6 +60,8 @@ public slots:
 
     void blockPinClicked( SFunctionPinIndex funcPinIndex );
 
+    void exportGraphToFile( const QString & filename );
+
 protected:
     void keyPressEvent( QKeyEvent * event ) override;
     void resizeEvent( QResizeEvent * event ) override;

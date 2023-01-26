@@ -73,6 +73,9 @@ public:
     int getExternalOutPinsId() const { return m_externalOutPinsInd; }
     int getExternalInPinsId() const { return m_externalInPinsInd; }
 
+public:
+    void saveToFile( const QString & filename );
+
 signals:
     void updated();
     void connectionChanged( SFunctionPinIndex const & inVertex,

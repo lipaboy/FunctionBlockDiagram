@@ -2,6 +2,9 @@
 
 #include "widgets/FunctionBlockDiagramWidget.h"
 
+#include <QMenu>
+#include <QMenuBar>
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
 {
@@ -17,13 +20,20 @@ MainWindow::MainWindow(QWidget *parent) :
     this->resize( size );
 
     m_fbd = new FunctionBlockDiagramWidget( 5, 5, functionInfoList, this );
-    qDebug() << m_fbd->view()->size();
-    qDebug() << m_fbd->view()->viewport()->size();
-    qDebug() << m_fbd->view()->sceneRect().size();
-    this->setCentralWidget( m_fbd );
-    qDebug() << m_fbd->view()->size();
-    qDebug() << m_fbd->view()->viewport()->size();
-    qDebug() << m_fbd->view()->sceneRect().size();
 
+    this->setCentralWidget( m_fbd );
+
+    QMenu * fileMenu = new QMenu( tr( "&Файл" ) );
+    fileMenu->addAction(
+                "&Экспорт графа",
+                this,
+                [ this ] () -> void
+    {
+        m_fbd->exportGraphToFile( "C:/Users/lipaboy/Desktop/⁣graph.txt" );
+    });
+
+    QMenuBar * mainMenu = new QMenuBar{};
+    mainMenu->addMenu( fileMenu );
+    this->setMenuBar( mainMenu );
 }
 

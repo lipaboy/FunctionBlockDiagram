@@ -166,6 +166,11 @@ void FunctionBlockDiagramWidget::blockPinClicked( SFunctionPinIndex funcPinIndex
     }
 }
 
+void FunctionBlockDiagramWidget::exportGraphToFile(const QString &filename)
+{
+    m_functionGraph->saveToFile( filename );
+}
+
 void FunctionBlockDiagramWidget::keyPressEvent(QKeyEvent *event)
 {
     if ( event->key() == Qt::Key::Key_Delete
