@@ -67,6 +67,16 @@ FunctionBlockDiagramWidget::FunctionBlockDiagramWidget(
 
         m_functionGraph->loadVertices( functionInfoList );
     }
+
+    auto pinSelectFunc =
+            [ this ] ( SFunctionPinIndex funcPinIndex, bool isSelected ) -> void
+    {
+        m_blockMap[ funcPinIndex.funcId ]->setPinSelected( funcPinIndex.pinType,
+                                                           funcPinIndex.pin,
+                                                           isSelected );
+    };
+    m_inPinSelected.setSwitchFunc( pinSelectFunc );
+    m_outPinSelected.setSwitchFunc( pinSelectFunc );
 }
 
 FunctionBlockDiagramWidget::~FunctionBlockDiagramWidget()
@@ -146,19 +156,15 @@ void FunctionBlockDiagramWidget::blockPinClicked( SFunctionPinIndex funcPinIndex
 {
     auto & pinSelected = ( funcPinIndex.pinType == SFunctionPinIndex::IN )
             ? m_inPinSelected : m_outPinSelected;
-    if ( pinSelected.has_value() )
-    {
-        setPinSelected( pinSelected.value(), false );
-    }
-    setPinSelected( funcPinIndex, true );
+    pinSelected.turnOn( funcPinIndex );
 
-    if ( m_inPinSelected.has_value() && m_outPinSelected.has_value() )
+    if ( m_inPinSelected.isOn() && m_outPinSelected.isOn() )
     {
         m_functionGraph->connectVertices( m_inPinSelected.value(),
                                           m_outPinSelected.value() );
 
-        setPinSelected( m_inPinSelected.value(), false );
-        setPinSelected( m_outPinSelected.value(), false );
+        m_inPinSelected.turnOff();
+        m_outPinSelected.turnOff();
     }
 }
 
@@ -185,15 +191,8 @@ void FunctionBlockDiagramWidget::mousePressEvent(QMouseEvent *event)
 {
     if ( event->buttons() == Qt::RightButton)
     {
-        if ( m_inPinSelected.has_value() )
-        {
-            setPinSelected( m_inPinSelected.value(), false );
-        }
-        if ( m_outPinSelected.has_value() )
-        {
-            setPinSelected( m_outPinSelected.value(), false );
-        }
-//        m_connectionSelected.reset();
+        m_inPinSelected.turnOff();
+        m_outPinSelected.turnOff();
     }
 }
 
@@ -202,25 +201,6 @@ void FunctionBlockDiagramWidget::resizeEvent(QResizeEvent *event)
     m_view->fitInView(0, 0, 500, 500, Qt::KeepAspectRatio);
 //    m_scene->setSceneRect( 0, 0, event->size().width(), event->size().height() );
     QWidget::resizeEvent( event );
-}
-
-void FunctionBlockDiagramWidget::setPinSelected(
-        const SFunctionPinIndex & funcPinIndex,
-        bool isSelected )
-{
-    m_blockMap[ funcPinIndex.funcId ]->setPinSelected( funcPinIndex.pinType,
-                                                       funcPinIndex.pin,
-                                                       isSelected );
-    auto & pinSelected = ( funcPinIndex.pinType == SFunctionPinIndex::IN )
-            ? m_inPinSelected : m_outPinSelected;
-    if ( isSelected )
-    {
-        pinSelected = funcPinIndex;
-    }
-    else
-    {
-        pinSelected.reset();
-    }
 }
 
 void FunctionBlockDiagramWidget::setConnection( const SFunctionPinIndex & inFuncIndex,

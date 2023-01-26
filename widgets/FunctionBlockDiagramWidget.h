@@ -3,52 +3,14 @@
 
 #include "models/FunctionGraph.h"
 
+#include "utils/SimpleSwitcher.h"
+
 #include <QWidget>
 #include <QGraphicsView>
 #include <QHash>
 
 #include <optional>
 #include <functional>
-
-template < class T >
-class SimpleSwitcher
-{
-public:
-    using TriggerType = std::function< void ( T, bool ) >;
-public:
-    SimpleSwitcher( std::optional< T > var = std::nullopt,
-                    TriggerType triggerFunc = TriggerType() )
-        : m_var(), m_trigger()
-    {}
-
-    void turnOn( T newVal )
-    {
-        if ( m_var.has_value() )
-        {
-            m_trigger( m_var.value(), false );
-        }
-        m_var = newVal;
-        m_trigger( m_var.value(), true );
-    }
-
-    void turnOff()
-    {
-        if ( m_var.has_value() )
-        {
-            m_trigger( m_var.value(), false );
-        }
-        m_var.reset();
-    }
-
-    void setSwitchFunc( TriggerType switchFunc )
-    {
-        m_trigger = switchFunc;
-    }
-
-private:
-    std::optional< T > m_var;
-    TriggerType m_trigger;
-};
 
 class FunctionBlockItem;
 class ConnectionItem;
@@ -108,9 +70,6 @@ protected:
     void mousePressEvent( QMouseEvent * event ) override;
     void resizeEvent( QResizeEvent * event ) override;
 
-private:
-    void setPinSelected(const SFunctionPinIndex & pairIndex, bool isSelected );
-
 private slots:
     void setConnection( const SFunctionPinIndex & inBlock,
                         const SFunctionPinIndex & outBlock,
@@ -131,10 +90,8 @@ private:
     FunctionGraph *                                 m_functionGraph{};
 
     // Connections
-    SimpleSwitcher< SFunctionPinIndex >             m_inPinSel{};
-    std::optional< SFunctionPinIndex >              m_inPinSelected{ std::nullopt };
-    SimpleSwitcher< SFunctionPinIndex >             m_outPinSel{};
-    std::optional< SFunctionPinIndex >              m_outPinSelected{ std::nullopt };
+    SimpleSwitcher< SFunctionPinIndex >             m_inPinSelected{};
+    SimpleSwitcher< SFunctionPinIndex >             m_outPinSelected{};
 
     QHash< SConnection, ConnectionItem * >          m_linesMap{};
     std::optional< SConnection >                    m_connectionSelected{ std::nullopt };

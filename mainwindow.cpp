@@ -4,6 +4,7 @@
 
 #include <QMenu>
 #include <QMenuBar>
+#include <QFileDialog>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
@@ -29,7 +30,12 @@ MainWindow::MainWindow(QWidget *parent) :
                 this,
                 [ this ] () -> void
     {
-        m_fbd->exportGraphToFile( "C:/Users/lipaboy/Desktop/⁣graph.txt" );
+        QString fileName = QFileDialog::getSaveFileName(
+                    this,
+                    tr( "Экспорт в ..." ),
+                    "~/graph.txt",
+                    tr("Text file (*.txt)"));
+        m_fbd->exportGraphToFile( fileName );
     });
 
     QMenuBar * mainMenu = new QMenuBar{};
