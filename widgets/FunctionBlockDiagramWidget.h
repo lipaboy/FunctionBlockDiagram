@@ -8,6 +8,47 @@
 #include <QHash>
 
 #include <optional>
+#include <functional>
+
+template < class T >
+class SimpleSwitcher
+{
+public:
+    using TriggerType = std::function< void ( T, bool ) >;
+public:
+    SimpleSwitcher( std::optional< T > var = std::nullopt,
+                    TriggerType triggerFunc = TriggerType() )
+        : m_var(), m_trigger()
+    {}
+
+    void turnOn( T newVal )
+    {
+        if ( m_var.has_value() )
+        {
+            m_trigger( m_var.value(), false );
+        }
+        m_var = newVal;
+        m_trigger( m_var.value(), true );
+    }
+
+    void turnOff()
+    {
+        if ( m_var.has_value() )
+        {
+            m_trigger( m_var.value(), false );
+        }
+        m_var.reset();
+    }
+
+    void setSwitchFunc( TriggerType switchFunc )
+    {
+        m_trigger = switchFunc;
+    }
+
+private:
+    std::optional< T > m_var;
+    TriggerType m_trigger;
+};
 
 class FunctionBlockItem;
 class ConnectionItem;
@@ -64,6 +105,7 @@ public slots:
 
 protected:
     void keyPressEvent( QKeyEvent * event ) override;
+    void mousePressEvent( QMouseEvent * event ) override;
     void resizeEvent( QResizeEvent * event ) override;
 
 private:
@@ -89,7 +131,9 @@ private:
     FunctionGraph *                                 m_functionGraph{};
 
     // Connections
+    SimpleSwitcher< SFunctionPinIndex >             m_inPinSel{};
     std::optional< SFunctionPinIndex >              m_inPinSelected{ std::nullopt };
+    SimpleSwitcher< SFunctionPinIndex >             m_outPinSel{};
     std::optional< SFunctionPinIndex >              m_outPinSelected{ std::nullopt };
 
     QHash< SConnection, ConnectionItem * >          m_linesMap{};

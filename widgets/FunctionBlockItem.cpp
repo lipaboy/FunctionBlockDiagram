@@ -22,7 +22,7 @@ FunctionBlockItem::FunctionBlockItem( const QString & labelText,
 
     m_block = new BlockItem( this );
     {
-        m_block->setBrush( Qt::gray );
+        m_block->setBrush( QColor( 184, 162, 173, 200 ) );
         QPen pen{};
         pen.setColor( Qt::black );
         pen.setWidth( 1 );

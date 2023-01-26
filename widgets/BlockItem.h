@@ -8,15 +8,28 @@
 #include <QGraphicsRectItem>
 #include <QPainter>
 
-class BlockItem : public QObject, public QGraphicsRectItem
+class BlockItem : public QObject, public QGraphicsItem
 {
     Q_OBJECT
+    Q_INTERFACES( QGraphicsItem )
 public:
     BlockItem( QObject * parent = nullptr );
     ~BlockItem() override = default;
 
 signals:
     void positionChanged();
+
+public:
+    QRectF boundingRect() const override;
+    void paint( QPainter * painter,
+                const QStyleOptionGraphicsItem * option,
+                QWidget * widget) override;
+
+    void setRect( const QRectF & rect );
+    void setBrush( const QBrush & brush );
+    void setPen( const QPen & pen );
+
+    QRectF rect() const { return m_rect; }
 
 protected:
     QVariant itemChange( QGraphicsItem::GraphicsItemChange change,
@@ -28,6 +41,10 @@ private:
 
 private:
     Qt::CursorShape         m_cursor = Qt::OpenHandCursor;
+    QRectF                  m_rect{};
+    QBrush                  m_brush{};
+    QPen                    m_pen{};
+    int                     m_radiusRounding = 10;
 };
 
 #endif // CBLOCKITEM_H

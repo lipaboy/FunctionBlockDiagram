@@ -4,7 +4,7 @@
 
 PinItem::PinItem( const QColor & baseColor, QObject * parent )
     : QObject( parent ),
-      QGraphicsRectItem(),
+      QGraphicsItem(),
       m_baseColor( baseColor )
 {
     QPen pen{};
@@ -16,6 +16,38 @@ PinItem::PinItem( const QColor & baseColor, QObject * parent )
 void PinItem::setSelected( bool isSelected )
 {
     setBrush( isSelected ? m_selectColor : m_baseColor );
+    update();
+}
+
+QRectF PinItem::boundingRect() const
+{
+    return m_rect;
+}
+
+void PinItem::paint(QPainter *painter,
+                    const QStyleOptionGraphicsItem *option,
+                    QWidget *widget)
+{
+    Q_UNUSED( option )
+    Q_UNUSED( widget )
+    painter->setPen( m_pen );
+    painter->setBrush( m_brush );
+    painter->drawRect( m_rect );
+}
+
+void PinItem::setRect(const QRectF &rect)
+{
+    m_rect = rect;
+}
+
+void PinItem::setBrush(const QBrush &brush)
+{
+    m_brush = brush;
+}
+
+void PinItem::setPen(const QPen &pen)
+{
+    m_pen = pen;
 }
 
 void PinItem::mousePressEvent( QGraphicsSceneMouseEvent * event )

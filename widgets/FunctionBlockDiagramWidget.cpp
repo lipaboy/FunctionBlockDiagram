@@ -150,19 +150,15 @@ void FunctionBlockDiagramWidget::blockPinClicked( SFunctionPinIndex funcPinIndex
     {
         setPinSelected( pinSelected.value(), false );
     }
-    pinSelected = funcPinIndex;
-    setPinSelected( pinSelected.value(), true );
+    setPinSelected( funcPinIndex, true );
 
     if ( m_inPinSelected.has_value() && m_outPinSelected.has_value() )
     {
-        setPinSelected( m_inPinSelected.value(), false );
-        setPinSelected( m_outPinSelected.value(), false );
-
         m_functionGraph->connectVertices( m_inPinSelected.value(),
                                           m_outPinSelected.value() );
 
-        m_inPinSelected.reset();
-        m_outPinSelected.reset();
+        setPinSelected( m_inPinSelected.value(), false );
+        setPinSelected( m_outPinSelected.value(), false );
     }
 }
 
@@ -185,6 +181,22 @@ void FunctionBlockDiagramWidget::keyPressEvent(QKeyEvent *event)
     }
 }
 
+void FunctionBlockDiagramWidget::mousePressEvent(QMouseEvent *event)
+{
+    if ( event->buttons() == Qt::RightButton)
+    {
+        if ( m_inPinSelected.has_value() )
+        {
+            setPinSelected( m_inPinSelected.value(), false );
+        }
+        if ( m_outPinSelected.has_value() )
+        {
+            setPinSelected( m_outPinSelected.value(), false );
+        }
+//        m_connectionSelected.reset();
+    }
+}
+
 void FunctionBlockDiagramWidget::resizeEvent(QResizeEvent *event)
 {
     m_view->fitInView(0, 0, 500, 500, Qt::KeepAspectRatio);
@@ -199,6 +211,16 @@ void FunctionBlockDiagramWidget::setPinSelected(
     m_blockMap[ funcPinIndex.funcId ]->setPinSelected( funcPinIndex.pinType,
                                                        funcPinIndex.pin,
                                                        isSelected );
+    auto & pinSelected = ( funcPinIndex.pinType == SFunctionPinIndex::IN )
+            ? m_inPinSelected : m_outPinSelected;
+    if ( isSelected )
+    {
+        pinSelected = funcPinIndex;
+    }
+    else
+    {
+        pinSelected.reset();
+    }
 }
 
 void FunctionBlockDiagramWidget::setConnection( const SFunctionPinIndex & inFuncIndex,
