@@ -198,7 +198,7 @@ void FunctionBlockDiagramWidget::mousePressEvent(QMouseEvent *event)
 
 void FunctionBlockDiagramWidget::resizeEvent(QResizeEvent *event)
 {
-    m_view->fitInView(0, 0, 500, 500, Qt::KeepAspectRatio);
+//    m_view->fitInView(0, 0, 500, 500, Qt::KeepAspectRatio);
 //    m_scene->setSceneRect( 0, 0, event->size().width(), event->size().height() );
     QWidget::resizeEvent( event );
 }
