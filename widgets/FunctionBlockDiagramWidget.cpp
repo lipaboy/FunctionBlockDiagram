@@ -173,6 +173,11 @@ void FunctionBlockDiagramWidget::exportGraphToFile(const QString &filename)
     m_functionGraph->saveToFile( filename );
 }
 
+void FunctionBlockDiagramWidget::createLogicAndBlock()
+{
+    m_functionGraph->addOperation( LogicOperations::AND_BOOL );
+}
+
 void FunctionBlockDiagramWidget::keyPressEvent(QKeyEvent *event)
 {
     if ( event->key() == Qt::Key::Key_Delete

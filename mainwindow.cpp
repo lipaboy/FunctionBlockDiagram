@@ -1,14 +1,19 @@
 #include "mainwindow.h"
 
+// Generating header
+#include "ui_mainwindow.h"
 #include "widgets/FunctionBlockDiagramWidget.h"
 
 #include <QMenu>
 #include <QMenuBar>
 #include <QFileDialog>
+#include <QAction>
 
-MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent)
+MainWindow::MainWindow( QWidget * parent )
+    : QMainWindow( parent )
+    , ui( new Ui::MainWindow )
 {
+    ui->setupUi( this );
     QVector< SFunctionInfo > functionInfoList =
     {
         { "Temperature", 3, 1 },
@@ -24,11 +29,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     this->setCentralWidget( m_fbd );
 
-    QMenu * fileMenu = new QMenu( tr( "&Файл" ) );
-    fileMenu->addAction(
-                "&Экспорт графа",
-                this,
-                [ this ] () -> void
+    connect( ui->exportToFileAction, &QAction::triggered,
+             this,
+             [ this ] () -> void
     {
         QString fileName = QFileDialog::getSaveFileName(
                     this,
@@ -36,10 +39,18 @@ MainWindow::MainWindow(QWidget *parent) :
                     "~/graph.txt",
                     tr("Text file (*.txt)"));
         m_fbd->exportGraphToFile( fileName );
-    });
+    } );
 
-    QMenuBar * mainMenu = new QMenuBar{};
-    mainMenu->addMenu( fileMenu );
-    this->setMenuBar( mainMenu );
+    connect( ui->addLogicAndAction, &QAction::triggered,
+             this,
+             [ this ] () -> void
+    {
+        m_fbd->createLogicAndBlock();
+    } );
+
 }
 
+MainWindow::~MainWindow()
+{
+    delete ui;
+}

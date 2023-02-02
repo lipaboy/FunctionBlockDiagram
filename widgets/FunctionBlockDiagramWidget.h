@@ -15,6 +15,8 @@
 class FunctionBlockItem;
 class ConnectionItem;
 
+using namespace fbd::model;
+
 struct SConnection
 {
     SFunctionPinIndex inFunc{};
@@ -64,6 +66,8 @@ public slots:
     void blockPinClicked( SFunctionPinIndex funcPinIndex );
 
     void exportGraphToFile( const QString & filename );
+
+    void createLogicAndBlock();
 
 protected:
     void keyPressEvent( QKeyEvent * event ) override;
