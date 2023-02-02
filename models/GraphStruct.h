@@ -6,9 +6,6 @@
 #include <QString>
 #include <QVector>
 
-namespace fbd::model
-{
-
 struct SFunctionPinIndex
 {
     enum EPinType
@@ -70,7 +67,5 @@ struct SFunctionInfo
     int             inputPinCount{};
     int             outputPinCount{};
 };
-
-}
 
 #endif // GRAPHSTRUCT_H

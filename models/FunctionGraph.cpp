@@ -2,9 +2,6 @@
 
 #include <QSaveFile>
 
-namespace fbd::model
-{
-
 FunctionGraph::FunctionGraph( int externalOutPinsCount,
                               int externalInPinsCount,
                               QObject * parent )
@@ -137,11 +134,9 @@ SFunctionPinIndexOpt &FunctionGraph::unzipOutIndex(const SFunctionPinIndex &inde
     return rget( false, index );
 }
 
-void FunctionGraph::addOperation(LogicOperations operation)
+void FunctionGraph::addOperation( LogicOperations operation )
 {
     int id = m_functionNodes.empty() ? 0 : m_functionNodes.back().id + 1;
     m_functionNodes.push_back( SFunctionNode{ id, "AND Logic", 2, 1 } );
     emit updated();
-}
-
 }

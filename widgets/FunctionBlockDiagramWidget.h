@@ -15,8 +15,6 @@
 class FunctionBlockItem;
 class ConnectionItem;
 
-using namespace fbd::model;
-
 struct SConnection
 {
     SFunctionPinIndex inFunc{};

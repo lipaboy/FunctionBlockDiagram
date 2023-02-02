@@ -8,9 +8,6 @@
 #include <QString>
 #include <QVector>
 
-namespace fbd::model
-{
-
 class FunctionGraph : public QObject
 {
     Q_OBJECT
@@ -37,8 +34,8 @@ public:
 
 signals:
     void updated();
-    void connectionChanged( fbd::model::SFunctionPinIndex const & inVertex,
-                            fbd::model::SFunctionPinIndex const & outVertex,
+    void connectionChanged( SFunctionPinIndex const & inVertex,
+                            SFunctionPinIndex const & outVertex,
                             bool hasConnection );
 
 private:
@@ -51,7 +48,5 @@ private:
     int                                 m_externalOutPinsInd{};
     int                                 m_externalInPinsInd{};
 };
-
-}
 
 #endif // CFUNCTIONGRAPH_H

@@ -14,8 +14,6 @@
 class BlockItem;
 class PinItem;
 
-using namespace fbd::model;
-
 class FunctionBlockItem : public QObject, public QGraphicsItemGroup
 {
     Q_OBJECT
