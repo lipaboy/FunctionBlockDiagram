@@ -3,10 +3,12 @@
 
 #include "GraphStruct.h"
 #include "Operations.h"
+#include "FunctionContainer.h"
 
 #include <QObject>
 #include <QString>
 #include <QVector>
+#include <QList>
 
 class FunctionGraph : public QObject
 {
@@ -25,7 +27,7 @@ public:
     void addOperation( LogicOperations operation );
 
 public:
-    QVector< SFunctionNode > getFunctionNodes() const { return m_functionNodes; }
+    QList< SFunctionNode > getFunctionNodes() const { return m_functionNodes.toList(); }
     int getExternalOutPinsId() const { return m_externalOutPinsInd; }
     int getExternalInPinsId() const { return m_externalInPinsInd; }
 
@@ -44,7 +46,8 @@ private:
     SFunctionPinIndexOpt & rget( bool isIn, SFunctionPinIndex const & index );
 
 private:
-    QVector< SFunctionNode >            m_functionNodes{};
+//    QVector< SFunctionNode >            m_functionNodes{};
+    FunctionContainer            m_functionNodes{};
     int                                 m_externalOutPinsInd{};
     int                                 m_externalInPinsInd{};
 };

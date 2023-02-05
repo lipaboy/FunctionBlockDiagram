@@ -44,6 +44,7 @@ private:
     QRectF                  m_rect{};
     QBrush                  m_brush{};
     QPen                    m_pen{};
+    QLinearGradient         m_gradient{};
     int                     m_radiusRounding = 10;
 };
 

@@ -40,15 +40,24 @@ using SFunctionPinIndexOpt = std::optional< SFunctionPinIndex >;
 
 struct SFunctionNode
 {
+    /** id - уникальный идентификатор узла (вершины) в графе. Каждая функция
+     *  даже с одинаковым типом должна иметь разные id.
+     */
     int                                 id{};
+    /** Под типом функции может подразумеваться адрес её в микроконтроллере,
+     *  либо идентификатор поведения функции (логическое И и т.п.).
+     *  (Пока не используется. Задел на будущее)
+     */
+    int                                 type{};
     QString                             name{};
-    /** Связь либо есть, либо её нет. Но pin существует в любом случае */
+    /** Связь либо есть, либо её нет (поэтому используем std::optional).
+     *  Но pin существует в любом случае (место в массиве выделяется в любом случае). */
     QVector< SFunctionPinIndexOpt >     inPins{};
     QVector< SFunctionPinIndexOpt >     outPins{};
 
-    SFunctionNode( int funcId, const QString & funcName,
+    SFunctionNode( const QString & funcName,
                    int inPinCount, int outPinCount )
-        : id( funcId )
+        : id( 0 )
         , name( funcName )
         , inPins( inPinCount )
         , outPins( outPinCount )

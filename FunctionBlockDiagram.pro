@@ -29,6 +29,7 @@ unix:  QMAKE_CXXFLAGS += -std=c++17
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
+    models/FunctionContainer.cpp \
     models/GraphStruct.cpp \
     utils/SimpleSwitcher.cpp \
     widgets/PinItem.cpp \
@@ -40,6 +41,7 @@ SOURCES += \
 
 HEADERS += \
     mainwindow.h \
+    models/FunctionContainer.h \
     models/GraphStruct.h \
     models/Operations.h \
     utils/SimpleSwitcher.h \

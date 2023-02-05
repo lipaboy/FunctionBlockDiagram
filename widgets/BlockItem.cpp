@@ -4,6 +4,12 @@ BlockItem::BlockItem( QObject * parent )
     : QObject( parent ),
       QGraphicsItem()
 {
+    m_gradient.setCoordinateMode( QGradient::ObjectBoundingMode );
+    m_gradient.setStart( 0.0, 0.0 );
+    m_gradient.setFinalStop( 1.0, 0.0 );
+    m_gradient.setColorAt( 0.0,  QColor::fromString( "#BB9898cd" ) );
+    m_gradient.setColorAt( 0.5,  QColor::fromString( "#BBaef1f9" ) );
+
 //    setCursor( m_cursor );
     //        QGraphicsItemGroup::setHandlesChildEvents( false );
 }
@@ -20,7 +26,9 @@ void BlockItem::paint( QPainter * painter,
 {
     Q_UNUSED( option )
     Q_UNUSED( widget )
-    painter->setBrush( m_brush );
+
+//    painter->setBrush( m_brush );
+    painter->setBrush( m_gradient );
     painter->setPen( m_pen );
     painter->drawRoundedRect( m_rect.x(), m_rect.y(),
                               m_rect.width(), m_rect.height(),

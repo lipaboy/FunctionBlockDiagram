@@ -32,7 +32,15 @@ void PinItem::paint(QPainter *painter,
     Q_UNUSED( widget )
     painter->setPen( m_pen );
     painter->setBrush( m_brush );
-    painter->drawRect( m_rect );
+    switch( m_type )
+    {
+    case RECT:
+        painter->drawRect( m_rect );
+        break;
+    case CIRCULAR:
+        painter->drawEllipse( m_rect );
+        break;
+    }
 }
 
 void PinItem::setRect(const QRectF &rect)
@@ -48,6 +56,11 @@ void PinItem::setBrush(const QBrush &brush)
 void PinItem::setPen(const QPen &pen)
 {
     m_pen = pen;
+}
+
+void PinItem::setType(const Type &type)
+{
+    m_type = type;
 }
 
 void PinItem::mousePressEvent( QGraphicsSceneMouseEvent * event )

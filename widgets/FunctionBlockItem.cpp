@@ -52,6 +52,7 @@ FunctionBlockItem::FunctionBlockItem( const QString & labelText,
     for ( int i = 0; i < outs; i++ )
     {
         auto * pinItem = new PinItem( outPinColor, this );
+        pinItem->setType( PinItem::CIRCULAR );
         m_outPins.push_back( pinItem );
         connect( pinItem, & PinItem::clicked,
                  this,

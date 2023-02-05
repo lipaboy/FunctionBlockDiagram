@@ -16,8 +16,8 @@ MainWindow::MainWindow( QWidget * parent )
     ui->setupUi( this );
     QVector< SFunctionInfo > functionInfoList =
     {
-        { "Temperature", 3, 1 },
-        { "Motor", 2, 2 },
+        { "Temperature", 3, 2 },
+        { "Motor", 2, 1 },
         { "Pressure", 1, 1 },
         { "Kek", 2, 2 },
     };

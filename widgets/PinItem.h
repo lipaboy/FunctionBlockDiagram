@@ -11,6 +11,13 @@ class PinItem : public QObject, public QGraphicsItem
     Q_OBJECT
     Q_INTERFACES( QGraphicsItem )
 public:
+    enum Type
+    {
+        RECT,
+        CIRCULAR
+    };
+
+public:
     PinItem( const QColor & baseColor, QObject * parent = nullptr );
     ~PinItem() override = default;
 
@@ -26,6 +33,7 @@ public:
     void setRect( const QRectF & rect );
     void setBrush( const QBrush & brush );
     void setPen( const QPen & pen );
+    void setType( const Type & type );
 
     QRectF rect() const { return m_rect; }
 
@@ -42,6 +50,7 @@ private:
     QRectF                  m_rect{};
     QPen                    m_pen;
     QBrush                  m_brush{};
+    Type                    m_type = Type::RECT;
 };
 
 #endif // CPINITEM_H

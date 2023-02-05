@@ -11,15 +11,13 @@ FunctionGraph::FunctionGraph( int externalOutPinsCount,
     {
         SFunctionNode node{};
         node.outPins.resize( externalOutPinsCount );
-        node.id = m_externalOutPinsInd = m_functionNodes.size();
-        m_functionNodes.push_back( node );
+        m_externalOutPinsInd = m_functionNodes.add( node );
     }
     if ( externalInPinsCount > 0 )
     {
         SFunctionNode node{};
         node.inPins.resize( externalInPinsCount );
-        node.id = m_externalInPinsInd = m_functionNodes.size();
-        m_functionNodes.push_back( node );
+        m_externalInPinsInd = m_functionNodes.add( node );
     }
 }
 
@@ -31,8 +29,7 @@ void FunctionGraph::loadVertices( QVector< SFunctionInfo > funcInfos )
         node.name = info.funcName;
         node.inPins.resize( info.inputPinCount );
         node.outPins.resize( info.outputPinCount );
-        node.id = m_functionNodes.size();
-        m_functionNodes.push_back( node );
+        m_functionNodes.add( node );
     }
 
     emit updated();
@@ -136,7 +133,6 @@ SFunctionPinIndexOpt &FunctionGraph::unzipOutIndex(const SFunctionPinIndex &inde
 
 void FunctionGraph::addOperation( LogicOperations operation )
 {
-    int id = m_functionNodes.empty() ? 0 : m_functionNodes.back().id + 1;
-    m_functionNodes.push_back( SFunctionNode{ id, "AND Logic", 2, 1 } );
+    m_functionNodes.add( SFunctionNode{ "AND", 2, 1 } );
     emit updated();
 }
