@@ -9,6 +9,8 @@
 #include <QFileDialog>
 #include <QAction>
 
+using view::FunctionBlockDiagramWidget;
+
 MainWindow::MainWindow( QWidget * parent )
     : QMainWindow( parent )
     , ui( new Ui::MainWindow )

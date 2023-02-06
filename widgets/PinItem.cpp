@@ -2,6 +2,9 @@
 
 #include <QCursor>
 
+namespace view
+{
+
 PinItem::PinItem( const QColor & baseColor, QObject * parent )
     : QObject( parent ),
       QGraphicsItem(),
@@ -81,3 +84,5 @@ void PinItem::mousePressEvent( QGraphicsSceneMouseEvent * event )
 //    m_rect.setWidth( newSize.width() );
 //    m_rect.setHeight( newSize.height() );
 //}
+
+}

@@ -1,6 +1,9 @@
-#include "BlockItem.h"
+#include "BodyItem.h"
 
-BlockItem::BlockItem( QObject * parent )
+namespace view
+{
+
+BodyItem::BodyItem( QObject * parent )
     : QObject( parent ),
       QGraphicsItem()
 {
@@ -14,13 +17,13 @@ BlockItem::BlockItem( QObject * parent )
     //        QGraphicsItemGroup::setHandlesChildEvents( false );
 }
 
-QRectF BlockItem::boundingRect() const
+QRectF BodyItem::boundingRect() const
 {
     QRectF bounding = m_rect;
     return bounding;
 }
 
-void BlockItem::paint( QPainter * painter,
+void BodyItem::paint( QPainter * painter,
                        const QStyleOptionGraphicsItem * option,
                        QWidget * widget )
 {
@@ -36,22 +39,22 @@ void BlockItem::paint( QPainter * painter,
                               Qt::AbsoluteSize);
 }
 
-void BlockItem::setRect(const QRectF &rect)
+void BodyItem::setRect(const QRectF &rect)
 {
     m_rect = rect;
 }
 
-void BlockItem::setBrush(const QBrush &brush)
+void BodyItem::setBrush(const QBrush &brush)
 {
     m_brush = brush;
 }
 
-void BlockItem::setPen(const QPen &pen)
+void BodyItem::setPen(const QPen &pen)
 {
     m_pen = pen;
 }
 
-QVariant BlockItem::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
+QVariant BodyItem::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
 {
 //    if ( change == ItemPositionChange )
 //    {
@@ -60,14 +63,16 @@ QVariant BlockItem::itemChange(QGraphicsItem::GraphicsItemChange change, const Q
     return QGraphicsItem::itemChange( change, value );
 }
 
-void BlockItem::mousePressEvent( QGraphicsSceneMouseEvent * event )
+void BodyItem::mousePressEvent( QGraphicsSceneMouseEvent * event )
 {
 //    this->setCursor( Qt::ClosedHandCursor );
     QGraphicsItem::mousePressEvent( event );
 }
 
-void BlockItem::mouseReleaseEvent( QGraphicsSceneMouseEvent * event )
+void BodyItem::mouseReleaseEvent( QGraphicsSceneMouseEvent * event )
 {
 //    this->setCursor( m_cursor );
     QGraphicsItem::mouseReleaseEvent( event );
+}
+
 }

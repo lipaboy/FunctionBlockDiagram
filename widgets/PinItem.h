@@ -6,6 +6,9 @@
 #include <QGraphicsRectItem>
 #include <QPainter>
 
+namespace view
+{
+
 class PinItem : public QObject, public QGraphicsItem
 {
     Q_OBJECT
@@ -52,5 +55,7 @@ private:
     QBrush                  m_brush{};
     Type                    m_type = Type::RECT;
 };
+
+}
 
 #endif // CPINITEM_H

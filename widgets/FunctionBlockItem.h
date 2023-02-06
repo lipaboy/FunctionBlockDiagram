@@ -11,7 +11,10 @@
 
 #include "models/FunctionGraph.h"
 
-class BlockItem;
+
+namespace view
+{
+class BodyItem;
 class PinItem;
 
 class FunctionBlockItem : public QObject, public QGraphicsItemGroup
@@ -53,7 +56,7 @@ private:
     void recalcItemsPos();
 
 private:
-    BlockItem *                 m_block{};
+    BodyItem *                 m_block{};
     QVector< PinItem * >        m_inPins{};
     QVector< PinItem * >        m_outPins{};
     QGraphicsSimpleTextItem *   m_label{};
@@ -65,5 +68,7 @@ private:
     qreal                       m_pinSpace{ 12 };
     QSizeF                      m_mainRectBase{ 50, m_pinSpace * 4 };
 };
+
+}
 
 #endif // FUNCTIONBLOCKITEM_H

@@ -8,6 +8,9 @@
 
 #include <QDebug>
 
+namespace view
+{
+
 FunctionBlockDiagramWidget::FunctionBlockDiagramWidget(
         int externalOutPinsCount,
         int externalInPinsCount,
@@ -280,4 +283,6 @@ void FunctionBlockDiagramWidget::setConnection( const SFunctionPinIndex & inFunc
             }, Qt::DirectConnection );
         }
     }
+}
+
 }

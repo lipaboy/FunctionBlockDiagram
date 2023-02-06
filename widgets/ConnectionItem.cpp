@@ -5,6 +5,9 @@
 
 #include <qmath.h>
 
+namespace view
+{
+
 ConnectionItem::ConnectionItem(QObject *parent)
     : QObject ( parent ),
       QGraphicsLineItem()
@@ -81,4 +84,6 @@ void ConnectionItem::recalcSelectionPolygon()
              << line().p2() + offset1;
     m_selectionPolygon = rotatedRect;
     update();
+}
+
 }

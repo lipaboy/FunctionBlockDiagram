@@ -12,6 +12,9 @@
 #include <optional>
 #include <functional>
 
+namespace view
+{
+
 class FunctionBlockItem;
 class ConnectionItem;
 
@@ -38,8 +41,8 @@ struct SConnection
 
 inline size_t qHash( const SConnection & key, size_t seed )
 {
-    return qHash( key.inFunc.funcId, seed ) ^ size_t( key.inFunc.pin )
-            ^ qHash( key.outFunc.funcId, seed ) ^ size_t( key.outFunc.pin );
+    return ::qHash( key.inFunc.funcId, seed ) ^ size_t( key.inFunc.pin )
+            ^ ::qHash( key.outFunc.funcId, seed ) ^ size_t( key.outFunc.pin );
 }
 
 class FunctionBlockDiagramWidget : public QWidget
@@ -83,10 +86,11 @@ private:
     QGraphicsScene *                                m_scene{};
     QPointF                                         m_blockAppearPoint{};
     QPointF                                         m_stepAppearPoint{ 0, 40 };
-    /** m_blockMap[ i ] == CFunctionGraph->getVertices()[ i ] */
+
+    // Blocks
+    /** m_blockMap.key == node.id */
     QHash< int, FunctionBlockItem * >               m_blockMap{};
-    FunctionBlockItem *                             m_externalOutBlock{};
-    FunctionBlockItem *                             m_externalInBlock{};
+    FunctionBlockItem *                             m_blockSelected = nullptr;
 
     // Model
     FunctionGraph *                                 m_functionGraph{};
@@ -98,5 +102,8 @@ private:
     QHash< SConnection, ConnectionItem * >          m_linesMap{};
     std::optional< SConnection >                    m_connectionSelected{ std::nullopt };
 };
+
+}
+
 
 #endif // CFUNCTIONBLOCKDIAGRAMWIDGET_H

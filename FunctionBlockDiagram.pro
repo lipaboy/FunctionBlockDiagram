@@ -32,9 +32,9 @@ SOURCES += \
     models/FunctionContainer.cpp \
     models/GraphStruct.cpp \
     utils/SimpleSwitcher.cpp \
+    widgets/BodyItem.cpp \
     widgets/PinItem.cpp \
     models/FunctionGraph.cpp \
-    widgets/BlockItem.cpp \
     widgets/FunctionBlockDiagramWidget.cpp \
     widgets/FunctionBlockItem.cpp \
     widgets/ConnectionItem.cpp
@@ -45,9 +45,9 @@ HEADERS += \
     models/GraphStruct.h \
     models/Operations.h \
     utils/SimpleSwitcher.h \
+    widgets/BodyItem.h \
     widgets/PinItem.h \
     models/FunctionGraph.h \
-    widgets/BlockItem.h \
     widgets/FunctionBlockDiagramWidget.h \
     widgets/FunctionBlockItem.h \
     widgets/ConnectionItem.h

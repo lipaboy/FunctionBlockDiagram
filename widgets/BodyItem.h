@@ -8,13 +8,16 @@
 #include <QGraphicsRectItem>
 #include <QPainter>
 
-class BlockItem : public QObject, public QGraphicsItem
+namespace view
+{
+
+class BodyItem : public QObject, public QGraphicsItem
 {
     Q_OBJECT
     Q_INTERFACES( QGraphicsItem )
 public:
-    BlockItem( QObject * parent = nullptr );
-    ~BlockItem() override = default;
+    BodyItem( QObject * parent = nullptr );
+    ~BodyItem() override = default;
 
 signals:
     void positionChanged();
@@ -47,5 +50,7 @@ private:
     QLinearGradient         m_gradient{};
     int                     m_radiusRounding = 10;
 };
+
+}
 
 #endif // CBLOCKITEM_H

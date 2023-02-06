@@ -1,9 +1,12 @@
 #include "FunctionBlockItem.h"
 
-#include "BlockItem.h"
+#include "BodyItem.h"
 #include "PinItem.h"
 
 #include <QDebug>
+
+namespace view
+{
 
 FunctionBlockItem::FunctionBlockItem( const QString & labelText,
                                       int ins,
@@ -20,14 +23,14 @@ FunctionBlockItem::FunctionBlockItem( const QString & labelText,
     addToGroup( m_label );
     m_label->setZValue( 1 );
 
-    m_block = new BlockItem( this );
+    m_block = new BodyItem( this );
     {
         m_block->setBrush( QColor( 184, 162, 173, 200 ) );
         QPen pen{};
         pen.setColor( Qt::black );
         pen.setWidth( 1 );
         m_block->setPen( pen );
-        connect( m_block, & BlockItem::positionChanged,
+        connect( m_block, & BodyItem::positionChanged,
                  this, & FunctionBlockItem::positionChanged,
                  Qt::DirectConnection );
     }
@@ -278,3 +281,4 @@ void FunctionBlockItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
     QGraphicsItemGroup::hoverEnterEvent( event );
 }
 
+}

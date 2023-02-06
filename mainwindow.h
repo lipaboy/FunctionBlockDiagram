@@ -22,11 +22,11 @@ public:
     ~MainWindow();
 
 private:
-    FunctionGraph *                     m_functionGraph{};
-    FunctionBlockDiagramWidget *        m_fbd{};
-    QVBoxLayout *                       m_vBox{};
+    FunctionGraph *                         m_functionGraph{};
+    view::FunctionBlockDiagramWidget *      m_fbd{};
+    QVBoxLayout *                           m_vBox{};
 
-    Ui::MainWindow * ui;
+    Ui::MainWindow *                        ui;
 };
 
 #endif // MAINWINDOW_H

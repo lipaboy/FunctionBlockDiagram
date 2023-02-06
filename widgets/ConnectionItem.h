@@ -6,6 +6,9 @@
 #include <QGraphicsLineItem>
 #include <QPen>
 
+namespace view
+{
+
 class ConnectionItem : public QObject, public QGraphicsLineItem
 {
     Q_OBJECT
@@ -37,5 +40,7 @@ private:
     const qreal                 m_selectionOffset = 10;
     QPolygonF                   m_selectionPolygon;
 };
+
+}
 
 #endif // CONNECTIONITEM_H
