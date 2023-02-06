@@ -13,14 +13,12 @@ BodyItem::BodyItem( QObject * parent )
     m_gradient.setColorAt( 0.0,  QColor::fromString( "#BB9898cd" ) );
     m_gradient.setColorAt( 0.5,  QColor::fromString( "#BBaef1f9" ) );
 
-//    setCursor( m_cursor );
-    //        QGraphicsItemGroup::setHandlesChildEvents( false );
+//    setFlag( QGraphicsItem::ItemIsSelectable, true );
 }
 
 QRectF BodyItem::boundingRect() const
 {
-    QRectF bounding = m_rect;
-    return bounding;
+    return m_rect;
 }
 
 void BodyItem::paint( QPainter * painter,
@@ -54,11 +52,26 @@ void BodyItem::setPen(const QPen &pen)
     m_pen = pen;
 }
 
-QVariant BodyItem::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
+void BodyItem::setSelected(bool isSelected)
 {
-//    if ( change == ItemPositionChange )
+    if ( isSelected )
+    {
+        m_gradient.setColorAt( 0.0,  QColor::fromString( "#BB989800" ) );
+        m_gradient.setColorAt( 0.5,  QColor::fromString( "#BBaef100" ) );
+    }
+    else
+    {
+        m_gradient.setColorAt( 0.0,  QColor::fromString( "#BB9898cd" ) );
+        m_gradient.setColorAt( 0.5,  QColor::fromString( "#BBaef1f9" ) );
+    }
+}
+
+QVariant BodyItem::itemChange( QGraphicsItem::GraphicsItemChange change,
+                               const QVariant & value )
+{
+//    if ( change == ItemSelectedChange )
 //    {
-//        emit positionChanged();
+//        emit selectionChanged( value.toBool() );
 //    }
     return QGraphicsItem::itemChange( change, value );
 }

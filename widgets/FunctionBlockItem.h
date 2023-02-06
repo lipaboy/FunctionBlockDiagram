@@ -9,11 +9,11 @@
 
 #include <optional>
 
-#include "models/FunctionGraph.h"
-
+#include "models/GraphStruct.h"
 
 namespace view
 {
+
 class BodyItem;
 class PinItem;
 
@@ -42,11 +42,15 @@ public:
 signals:
     void pinClicked( SFunctionPinIndex::EPinType type, int pinIndex );
     void positionChanged();
+    void selectionChanged( bool isSelected );
 
 protected:
     QVariant itemChange( QGraphicsItem::GraphicsItemChange change,
                          const QVariant & value ) override;
     QRectF boundingRect() const override;
+    void paint( QPainter * painter,
+                const QStyleOptionGraphicsItem * option,
+                QWidget * widget = nullptr ) override;
 
 private:
     void mousePressEvent( QGraphicsSceneMouseEvent * event ) override;

@@ -41,18 +41,13 @@ FunctionBlockDiagramWidget::FunctionBlockDiagramWidget(
     {
         int textureSize = 32;
         QPixmap texture( textureSize, textureSize );
-        texture.fill( Qt::black );
         QImage image = texture.toImage();
-        image.fill( Qt::black );
+        image.fill( QColor::fromString( "#040812" ) );
         image.setPixel( image.width() / 2,
                         image.height() / 2,
                         QColor( Qt::red ).rgb() );
 
         texture.convertFromImage( image );
-
-        QBrush brush( Qt::black, Qt::SolidPattern );
-        brush.setTexture( texture );
-
         m_view->setBackgroundBrush( QBrush( texture ) );
     }
 

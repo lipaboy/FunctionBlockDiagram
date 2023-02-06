@@ -31,6 +31,7 @@ public:
     void setRect( const QRectF & rect );
     void setBrush( const QBrush & brush );
     void setPen( const QPen & pen );
+    void setSelected( bool isSelected );
 
     QRectF rect() const { return m_rect; }
 

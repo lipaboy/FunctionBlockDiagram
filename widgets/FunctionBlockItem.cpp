@@ -3,7 +3,7 @@
 #include "BodyItem.h"
 #include "PinItem.h"
 
-#include <QDebug>
+#include <QStyleOptionGraphicsItem>
 
 namespace view
 {
@@ -33,6 +33,12 @@ FunctionBlockItem::FunctionBlockItem( const QString & labelText,
         connect( m_block, & BodyItem::positionChanged,
                  this, & FunctionBlockItem::positionChanged,
                  Qt::DirectConnection );
+        connect( this, & FunctionBlockItem::selectionChanged,
+                 this,
+                 [ this ] ( bool isSelected ) -> void
+        {
+            m_block->setSelected( isSelected );
+        } );
     }
     addToGroup( m_block );
     m_block->setZValue( 0 );
@@ -49,6 +55,7 @@ FunctionBlockItem::FunctionBlockItem( const QString & labelText,
             emit this->pinClicked( SFunctionPinIndex::IN, index );
         }, Qt::DirectConnection );
         pinItem->setZValue( 2 );
+        this->addToGroup( pinItem );
     }
 
     QColor outPinColor = Qt::red;
@@ -64,7 +71,9 @@ FunctionBlockItem::FunctionBlockItem( const QString & labelText,
             emit this->pinClicked( SFunctionPinIndex::OUT, index );
         }, Qt::DirectConnection );
         pinItem->setZValue( 2 );
+        this->addToGroup( pinItem );
     }
+    this->
 
     recalcItemsPos();
 
@@ -72,9 +81,12 @@ FunctionBlockItem::FunctionBlockItem( const QString & labelText,
     QGraphicsItemGroup::setFiltersChildEvents( true );
     //    setAcceptHoverEvents( true );
 
-
     setFlag( QGraphicsItem::ItemIsMovable, true );
     setFlag( QGraphicsItem::ItemSendsScenePositionChanges, true );
+    // странный эффект гуишный возникает. Может делать кастомное выделение???
+    setFlag( QGraphicsItem::ItemIsSelectable, true );
+
+//    this->setPen( Qt::NoPen );
 }
 
 void FunctionBlockItem::recalcItemsPos()
@@ -119,7 +131,6 @@ void FunctionBlockItem::recalcItemsPos()
             pinRect.moveCenter( QPointF( centerX,
                                          firstY + i * pinDistance ) );
             pin->setRect( pinRect );
-            this->addToGroup( pin );
             i++;
         }
     };
@@ -190,6 +201,13 @@ QVariant FunctionBlockItem::itemChange( QGraphicsItem::GraphicsItemChange change
     {
         emit positionChanged();
     }
+    else if ( change == ItemSelectedChange )
+    {
+        auto kek = this->childItems();
+        qDebug() << kek.size();
+//        setFlag( QGraphicsItem::ItemIsSelectable, ! (value.toBool()) );
+        emit selectionChanged( value.toBool() );
+    }
     return QGraphicsItem::itemChange( change, value );
 }
 
@@ -199,6 +217,15 @@ QRectF FunctionBlockItem::boundingRect() const
     // additem is actualized. This leads to the fact that the boundingrect
     // will not close around the word items after e.g., moving them.
     return childrenBoundingRect();
+}
+
+void FunctionBlockItem::paint( QPainter * painter,
+                               const QStyleOptionGraphicsItem * option,
+                               QWidget * widget )
+{
+    QStyleOptionGraphicsItem myOption(*option);
+    myOption.state &= ~QStyle::State_Selected;
+    QGraphicsItemGroup::paint(painter, &myOption, widget);
 }
 
 void FunctionBlockItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
