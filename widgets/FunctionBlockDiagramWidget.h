@@ -56,9 +56,6 @@ public:
             QWidget *parent = nullptr );
     ~FunctionBlockDiagramWidget() override;
 
-public:
-    decltype(auto) view() { return m_view; }
-
 signals:
 
 public slots:
@@ -90,7 +87,8 @@ private:
     // Blocks
     /** m_blockMap.key == node.id */
     QHash< int, FunctionBlockItem * >               m_blockMap{};
-    FunctionBlockItem *                             m_blockSelected = nullptr;
+    std::optional< int >                            m_blockIdSelected{ std::nullopt };
+    bool                                            m_isFirstGraphVisualization = true;
 
     // Model
     FunctionGraph *                                 m_functionGraph{};

@@ -203,9 +203,6 @@ QVariant FunctionBlockItem::itemChange( QGraphicsItem::GraphicsItemChange change
     }
     else if ( change == ItemSelectedChange )
     {
-        auto kek = this->childItems();
-        qDebug() << kek.size();
-//        setFlag( QGraphicsItem::ItemIsSelectable, ! (value.toBool()) );
         emit selectionChanged( value.toBool() );
     }
     return QGraphicsItem::itemChange( change, value );

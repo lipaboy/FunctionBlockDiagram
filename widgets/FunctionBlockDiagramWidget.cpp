@@ -5,8 +5,7 @@
 
 #include <QKeyEvent>
 #include <QVBoxLayout>
-
-#include <QDebug>
+#include <QSet>
 
 namespace view
 {
@@ -63,7 +62,7 @@ FunctionBlockDiagramWidget::FunctionBlockDiagramWidget(
                  this, &FunctionBlockDiagramWidget::setConnection,
                  Qt::DirectConnection );
 
-        m_functionGraph->loadVertices( functionInfoList );
+        m_functionGraph->loadFunctions( functionInfoList );
     }
 
     auto pinSelectFunc =
@@ -89,9 +88,21 @@ void FunctionBlockDiagramWidget::graphUpdated()
 {
     auto nodeList = m_functionGraph->getFunctionNodes();
 
+    QSet< int > blocksToDelete{};
+    {
+        auto keyList = m_blockMap.keys();
+        std::copy( keyList.begin(), keyList.end(),
+                   std::inserter( blocksToDelete,
+                                  blocksToDelete.begin() ) );
+    }
+
     QPointF position = m_blockAppearPoint;
     for ( auto & node : nodeList )
     {
+        /** Если мы встретили в модели функцию, значит её не нужно удалять.
+         *  Удаляем те, которых больше нет в модели. */
+        blocksToDelete.remove( node.id );
+
         if ( m_blockMap.contains( node.id ) )
         {
             continue;
@@ -118,6 +129,20 @@ void FunctionBlockDiagramWidget::graphUpdated()
         {
             blockPinClicked( SFunctionPinIndex( type, funcId, pinIndex ) );
         }, Qt::DirectConnection );
+        connect( blockItem, & FunctionBlockItem::selectionChanged,
+                 this,
+                 [ this, funcId = node.id ]
+                 ( bool isSelected ) -> void
+        {
+            if ( isSelected )
+            {
+                m_blockIdSelected = funcId;
+            }
+            else
+            {
+                m_blockIdSelected.reset();
+            }
+        }, Qt::DirectConnection );
 
         if ( node.id != m_functionGraph->getExternalOutPinsId()
              && node.id != m_functionGraph->getExternalInPinsId() )
@@ -127,6 +152,13 @@ void FunctionBlockDiagramWidget::graphUpdated()
         }
     }
 
+    for ( int blockId : blocksToDelete )
+    {
+        auto * blockItem = m_blockMap.take( blockId );
+        delete blockItem;
+    }
+
+    if ( m_isFirstGraphVisualization )
     {
         int outPinsId = m_functionGraph->getExternalOutPinsId();
         auto * outPinBlock = m_blockMap[ outPinsId ];
@@ -136,6 +168,7 @@ void FunctionBlockDiagramWidget::graphUpdated()
         outPinBlock->setTopLeftPos( QPointF( 50, 0 ) );
     }
 
+    if ( m_isFirstGraphVisualization )
     {
         int inPinsId = m_functionGraph->getExternalInPinsId();
         auto * inPinBlock = m_blockMap[ inPinsId ];
@@ -148,6 +181,8 @@ void FunctionBlockDiagramWidget::graphUpdated()
                          - inPinBlock->size().width(),
                         0 ) );
     }
+
+    m_isFirstGraphVisualization = false;
 }
 
 void FunctionBlockDiagramWidget::blockPinClicked( SFunctionPinIndex funcPinIndex )
@@ -158,7 +193,7 @@ void FunctionBlockDiagramWidget::blockPinClicked( SFunctionPinIndex funcPinIndex
 
     if ( m_inPinSelected.isOn() && m_outPinSelected.isOn() )
     {
-        m_functionGraph->connectVertices( m_inPinSelected.value(),
+        m_functionGraph->connectPins( m_inPinSelected.value(),
                                           m_outPinSelected.value() );
 
         m_inPinSelected.turnOff();
@@ -184,15 +219,20 @@ void FunctionBlockDiagramWidget::keyPressEvent(QKeyEvent *event)
         if ( m_connectionSelected.has_value() )
         {
             auto con = m_connectionSelected.value();
-            m_functionGraph->disconnectVertices( con.inFunc, con.outFunc );
+            m_functionGraph->disconnectPins( con.inFunc, con.outFunc );
             m_connectionSelected.reset();
+        }
+        if ( m_blockIdSelected.has_value() )
+        {
+            m_functionGraph->removeFunction( m_blockIdSelected.value() );
+            m_blockIdSelected.reset();
         }
     }
 }
 
 void FunctionBlockDiagramWidget::mousePressEvent(QMouseEvent *event)
 {
-    if ( event->buttons() == Qt::RightButton)
+    if ( event->buttons() == Qt::RightButton )
     {
         m_inPinSelected.turnOff();
         m_outPinSelected.turnOff();

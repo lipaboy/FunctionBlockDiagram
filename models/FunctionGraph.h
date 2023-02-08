@@ -19,12 +19,13 @@ public:
                             QObject * parent = nullptr );
 
 public:
-    void loadVertices( QVector< SFunctionInfo > funcInfos );
-    void connectVertices( SFunctionPinIndex const & inVertex,
+    void loadFunctions( QVector< SFunctionInfo > funcInfos );
+    void connectPins( SFunctionPinIndex const & inVertex,
                           SFunctionPinIndex const & outVertex );
-    void disconnectVertices( SFunctionPinIndex const & inVertex,
+    void disconnectPins( SFunctionPinIndex const & inVertex,
                              SFunctionPinIndex const & outVertex );
     void addOperation( LogicOperations operation );
+    void removeFunction( int functionId );
 
 public:
     QList< SFunctionNode > getFunctionNodes() const { return m_functionNodes.toList(); }
@@ -46,8 +47,7 @@ private:
     SFunctionPinIndexOpt & rget( bool isIn, SFunctionPinIndex const & index );
 
 private:
-//    QVector< SFunctionNode >            m_functionNodes{};
-    FunctionContainer            m_functionNodes{};
+    FunctionContainer                   m_functionNodes{};
     int                                 m_externalOutPinsInd{};
     int                                 m_externalInPinsInd{};
 };

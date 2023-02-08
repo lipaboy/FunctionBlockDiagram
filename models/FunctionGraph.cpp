@@ -21,7 +21,7 @@ FunctionGraph::FunctionGraph( int externalOutPinsCount,
     }
 }
 
-void FunctionGraph::loadVertices( QVector< SFunctionInfo > funcInfos )
+void FunctionGraph::loadFunctions( QVector< SFunctionInfo > funcInfos )
 {
     for ( auto & info : funcInfos )
     {
@@ -35,7 +35,7 @@ void FunctionGraph::loadVertices( QVector< SFunctionInfo > funcInfos )
     emit updated();
 }
 
-void FunctionGraph::connectVertices( const SFunctionPinIndex & inVertex,
+void FunctionGraph::connectPins( const SFunctionPinIndex & inVertex,
                                      const SFunctionPinIndex & outVertex )
 {
     SFunctionPinIndexOpt & rInPin = unzipInIndex( inVertex );
@@ -51,7 +51,7 @@ void FunctionGraph::connectVertices( const SFunctionPinIndex & inVertex,
     }
 }
 
-void FunctionGraph::disconnectVertices( const SFunctionPinIndex & inVertex,
+void FunctionGraph::disconnectPins( const SFunctionPinIndex & inVertex,
                                         const SFunctionPinIndex & outVertex )
 {
     SFunctionPinIndexOpt & rInPin = unzipInIndex( inVertex );
@@ -82,11 +82,10 @@ void FunctionGraph::saveToFile(const QString &filename)
         return appendUint8( appendUint8( data, r >> 8 ), r );
     };
 
-    for ( int i = 0; i < m_functionNodes.size(); i++ )
+    for ( auto & node : m_functionNodes )
     {
-        auto & node = m_functionNodes[ i ];
         /** Индекс блока */
-        appendUint16( data, static_cast< quint16 >( i ) );
+        appendUint16( data, static_cast< quint16 >( node.id ) );
         /** Адрес функции в микроконтроллере */
         appendUint16( data, static_cast< quint16 >( 0 ) );
         for ( int inPinInd = 0; inPinInd < node.inPins.size(); ++inPinInd )
@@ -102,8 +101,6 @@ void FunctionGraph::saveToFile(const QString &filename)
                 zip <<= 4;
                 zip = ( mask & zip ) | static_cast< quint16 >( inPin.pin );
                 appendUint16( data, zip );
-//                appendUint16( data, static_cast< quint16 >( inPin.funcId ) );
-//                appendUint16( data, static_cast< quint16 >( inPin.pin ) );
             }
         }
         data.append( '\n' ).append( '\r' );
@@ -135,4 +132,14 @@ void FunctionGraph::addOperation( LogicOperations operation )
 {
     m_functionNodes.add( SFunctionNode{ "AND", 2, 1 } );
     emit updated();
+}
+
+void FunctionGraph::removeFunction( int functionId )
+{
+    if ( functionId != m_externalInPinsInd
+         && functionId != m_externalOutPinsInd )
+    {
+        m_functionNodes.remove( functionId );
+        emit updated();
+    }
 }
