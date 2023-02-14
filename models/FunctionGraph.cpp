@@ -11,13 +11,63 @@ FunctionGraph::FunctionGraph( int externalOutPinsCount,
     {
         SFunctionNode node{};
         node.outPins.resize( externalOutPinsCount );
-        m_externalOutPinsInd = m_functionNodes.add( node );
+        m_externalOutPinsInd = m_nodes.add( node );
+
+//        SFunctionInfo info{};
+//        info.funcName = "Out";
+//        info.outputPinCount = externalOutPinsCount;
+//        info.funcAddress = 0;
+//        m_functions.insert( info.funcName, info );
     }
     if ( externalInPinsCount > 0 )
     {
         SFunctionNode node{};
         node.inPins.resize( externalInPinsCount );
-        m_externalInPinsInd = m_functionNodes.add( node );
+        m_externalInPinsInd = m_nodes.add( node );
+
+//        SFunctionInfo info{};
+//        info.funcName = "In";
+//        info.inputPinCount = externalInPinsCount;
+//        info.funcAddress = 0;
+//        m_functions.insert( info.funcName, info );
+    }
+
+    {
+        QVector< QString > binaryOpers =
+        {
+            "AND_BOOL",
+            "OR_BOOL",
+            "XOR_BOOL",
+            "AND_BIT",
+            "OR_BIT",
+            "XOR_BIT",
+        };
+        for ( auto & op : binaryOpers )
+        {
+            SFunctionInfo info{};
+            info.funcAddress = 0;
+            info.funcName = op;
+            info.inputPinCount = 2;
+            info.outputPinCount = 1;
+            m_functions.insert( op, info );
+        }
+    }
+
+    {
+        QVector< QString > unaryOpers =
+        {
+            "NOT_BOOL",
+            "NOT_BIT",
+        };
+        for ( auto & op : unaryOpers )
+        {
+            SFunctionInfo info{};
+            info.funcAddress = 0;
+            info.funcName = op;
+            info.inputPinCount = 1;
+            info.outputPinCount = 1;
+            m_functions.insert( op, info );
+        }
     }
 }
 
@@ -27,9 +77,11 @@ void FunctionGraph::loadFunctions( QVector< SFunctionInfo > funcInfos )
     {
         SFunctionNode node{};
         node.name = info.funcName;
+        node.type = info.funcAddress;
         node.inPins.resize( info.inputPinCount );
         node.outPins.resize( info.outputPinCount );
-        m_functionNodes.add( node );
+        m_nodes.add( node );
+        m_functions.insert( info.funcName, info );
     }
 
     emit updated();
@@ -82,7 +134,7 @@ void FunctionGraph::saveToFile(const QString &filename)
         return appendUint8( appendUint8( data, r >> 8 ), r );
     };
 
-    for ( auto & node : m_functionNodes )
+    for ( auto & node : m_nodes )
     {
         /** Индекс блока */
         appendUint16( data, static_cast< quint16 >( node.id ) );
@@ -114,8 +166,8 @@ void FunctionGraph::saveToFile(const QString &filename)
 SFunctionPinIndexOpt & FunctionGraph::rget( bool isIn,
                                             const SFunctionPinIndex & index)
 {
-    return isIn ? m_functionNodes[ index.funcId ].inPins[ index.pin ]
-            : m_functionNodes[ index.funcId ].outPins[ index.pin ];
+    return isIn ? m_nodes[ index.funcId ].inPins[ index.pin ]
+            : m_nodes[ index.funcId ].outPins[ index.pin ];
 }
 
 SFunctionPinIndexOpt & FunctionGraph::unzipInIndex( const SFunctionPinIndex & index )
@@ -128,10 +180,14 @@ SFunctionPinIndexOpt &FunctionGraph::unzipOutIndex(const SFunctionPinIndex &inde
     return rget( false, index );
 }
 
-void FunctionGraph::addOperation( LogicOperations operation )
+void FunctionGraph::addFunction( const QString & functionName )
 {
-    m_functionNodes.add( SFunctionNode{ "AND", 2, 1 } );
-    emit updated();
+    auto iter = m_functions.find( functionName );
+    if ( iter != m_functions.end() )
+    {
+        m_nodes.add( SFunctionNode{ *iter } );
+        emit updated();
+    }
 }
 
 void FunctionGraph::removeFunction( int functionId )
@@ -139,7 +195,7 @@ void FunctionGraph::removeFunction( int functionId )
     if ( functionId != m_externalInPinsInd
          && functionId != m_externalOutPinsInd )
     {
-        m_functionNodes.remove( functionId );
+        m_nodes.remove( functionId );
         emit updated();
     }
 }

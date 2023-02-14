@@ -42,19 +42,10 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="addLogicAndAction"/>
   </widget>
   <action name="exportToFileAction">
    <property name="text">
     <string>Экспорт в файл</string>
-   </property>
-  </action>
-  <action name="addLogicAndAction">
-   <property name="text">
-    <string>AND</string>
-   </property>
-   <property name="toolTip">
-    <string>Добавить логическую операцию И</string>
    </property>
   </action>
  </widget>

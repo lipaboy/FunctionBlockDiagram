@@ -24,11 +24,13 @@ public:
                           SFunctionPinIndex const & outVertex );
     void disconnectPins( SFunctionPinIndex const & inVertex,
                              SFunctionPinIndex const & outVertex );
-    void addOperation( LogicOperations operation );
+    /** Имя функции должно быть в m_functions */
+    void addFunction(const QString &functionName);
     void removeFunction( int functionId );
 
 public:
-    QList< SFunctionNode > getFunctionNodes() const { return m_functionNodes.toList(); }
+    QList< SFunctionNode > getNodes() const { return m_nodes.toList(); }
+    QList< SFunctionInfo > getFunctionInfos() const { return m_functions.values(); }
     int getExternalOutPinsId() const { return m_externalOutPinsInd; }
     int getExternalInPinsId() const { return m_externalInPinsInd; }
 
@@ -47,7 +49,9 @@ private:
     SFunctionPinIndexOpt & rget( bool isIn, SFunctionPinIndex const & index );
 
 private:
-    FunctionContainer                   m_functionNodes{};
+    FunctionContainer                   m_nodes{};
+    /** Названия функций должны быть уникальны! */
+    QHash< QString, SFunctionInfo >     m_functions{};
     int                                 m_externalOutPinsInd{};
     int                                 m_externalInPinsInd{};
 };

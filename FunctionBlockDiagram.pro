@@ -31,6 +31,7 @@ SOURCES += \
     mainwindow.cpp \
     models/FunctionContainer.cpp \
     models/GraphStruct.cpp \
+    models/Operations.cpp \
     utils/SimpleSwitcher.cpp \
     widgets/BodyItem.cpp \
     widgets/PinItem.cpp \

@@ -38,6 +38,14 @@ struct SFunctionPinIndex
 
 using SFunctionPinIndexOpt = std::optional< SFunctionPinIndex >;
 
+struct SFunctionInfo
+{
+    QString         funcName{};
+    int             funcAddress{};
+    int             inputPinCount{};
+    int             outputPinCount{};
+};
+
 struct SFunctionNode
 {
     /** id - уникальный идентификатор узла (вершины) в графе. Каждая функция
@@ -64,17 +72,20 @@ struct SFunctionNode
     {
 
     }
+    SFunctionNode( const SFunctionInfo & info )
+        : id( 0 )
+        , type( info.funcAddress )
+        , name( info.funcName )
+        , inPins( info.inputPinCount )
+        , outPins( info.outputPinCount )
+    {
+
+    }
     SFunctionNode()
     {
 
     }
 };
 
-struct SFunctionInfo
-{
-    QString         funcName{};
-    int             inputPinCount{};
-    int             outputPinCount{};
-};
 
 #endif // GRAPHSTRUCT_H

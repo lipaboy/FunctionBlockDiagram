@@ -86,7 +86,7 @@ FunctionBlockDiagramWidget::~FunctionBlockDiagramWidget()
 
 void FunctionBlockDiagramWidget::graphUpdated()
 {
-    auto nodeList = m_functionGraph->getFunctionNodes();
+    auto nodeList = m_functionGraph->getNodes();
 
     QSet< int > blocksToDelete{};
     {
@@ -206,9 +206,9 @@ void FunctionBlockDiagramWidget::exportGraphToFile(const QString &filename)
     m_functionGraph->saveToFile( filename );
 }
 
-void FunctionBlockDiagramWidget::createLogicAndBlock()
+void FunctionBlockDiagramWidget::addFunction( const QString & functionName )
 {
-    m_functionGraph->addOperation( LogicOperations::AND_BOOL );
+    m_functionGraph->addFunction( functionName );
 }
 
 void FunctionBlockDiagramWidget::keyPressEvent(QKeyEvent *event)

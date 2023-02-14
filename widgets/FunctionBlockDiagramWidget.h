@@ -60,12 +60,12 @@ signals:
 
 public slots:
     void graphUpdated();
-
     void blockPinClicked( SFunctionPinIndex funcPinIndex );
-
     void exportGraphToFile( const QString & filename );
+    void addFunction(const QString &functionName);
 
-    void createLogicAndBlock();
+public:
+    FunctionGraph * getGraph() const { return m_functionGraph; }
 
 protected:
     void keyPressEvent( QKeyEvent * event ) override;
